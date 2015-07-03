@@ -1,5 +1,20 @@
 \section{Related Work}
 
-Testing von
-		GDB
-		LLDB
+\ac{GDB}
+
+The \ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
+Tests for this debugger are written in Python and with the 
+unittest framework that comes with Python.
+While those test verify the debugger's command
+line interface and the scripting API, they also test other functionality, such
+as using the help menu or changing the debugger settings.
+Further, some of those tests
+verify the debugging behavior on different platforms, such as Darwin, Linux or
+FreeBSD.
+In contrast to the \ac{LLDB} project, we only concentrate on testing
+the debugging behavior. The approach for doing so is derived from the \ac{LLDB} 
+project:
+write a program in the source-language (mbeddr), compile it to an executable and
+debug it through test cases, which verify the debugging behavior. While the 
+\ac{LLDB} project also tests other aspects with Python scripts, we could invent
+further \acp{DSL} for testing those aspects as well.
