@@ -1,0 +1,27 @@
+mbeddr:
+    C + Extensions 
+	    -> Lang ex +  Generator + Debugger
+		+ Sample von Extension (focus on Generator)
+    Debugger muss Extensible sein
+	    DSL zum beschreiben von debugger
+		+ Debugger verhalten für sample
+Testing von debugger
+	Requirements
+		Generic
+		Embedded
+	DSL zum beschreiben von Debugger verhalten, die ist erweiterbar integriert Debugger mit C + Extensions
+	Beschreibt das verhalten auf der Abstraction der Erweiterung von C und nicht auf C level 
+Sample
+	Test für das Sample
+		For Each im TestCase call from test expression
+			CallStack
+			Variablen
+Future Work
+	Engere Integration mit Beschreibungs DSL
+	Ableiten von tests aus der Beschreibung
+	Mögliche Ableitung von Debugger verhalten aus Generator ...
+Related Work
+	Testing von
+		GDB
+		LLDB
+
