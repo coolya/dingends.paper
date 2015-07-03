@@ -7,37 +7,53 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\documentclass[twocolumn]{IEEEtran} %!PN
+\documentclass[conference]{template/IEEEtran} %!PN
 %\documentclass[12pt,draft]{IEEEtran} %!PN
 %\documentstyle[twocolumn]{IEEEtran}
 %\documentstyle[12pt,twoside,draft]{IEEEtran}
 %\documentstyle[9pt,twocolumn,technote,twoside]{IEEEtran}
 
-
+\usepackage[english]{babel}
+\usepackage{blindtext}
 
 \begin{document}
 
 %\title{Using the Style File IEEEtran.sty} 
 \title{Testing Debuggers for Extensible Languages} %!PN
 
-\author{Gerry Murray, Silvano Balemi}
-
-\markboth{IEEE Transactions On Automatic Control, Vol. XX, No. Y, Month
-1999}
-%{Murray and Balemi: Using the style file IEEEtran.sty} %!PN
-{Murray and Balemi: Using the Document Class IEEEtran.cls} %!PN
-
+\author{\IEEEauthorblockN{Domenik Pavletic}
+\IEEEauthorblockA{itemis AG\\
+Stuttgart, Germany\\
+pavletic@itemis.com
+}
+\and
+\IEEEauthorblockN{Kolja Dummann}
+\IEEEauthorblockA{itemis AG\\
+Stuttgart, Germany\\
+dummann@itemis.com
+}
+\and
+\IEEEauthorblockN{Syed Aoun Raza}
+\IEEEauthorblockA{Stuttgart, Germany\\
+aoun.raza@gmail.com}
+}
 
 \maketitle
-%\thispagestyle{plain}\pagestyle{plain}
 
 \begin{abstract}
 bla
 \end{abstract}
 
+\begin{IEEEkeywords}
+Extensible Languages, Domain-Specific Languages, Debuggers, Testing.
+\end{IEEEkeywords}
 
-\section{Introduction}
-
-
+\input{chapters/introduction}
+\input{chapters/mbeddr}
+\input{chapters/mbeddrDebugger}
+\input{chapters/requirements}
+\input{chapters/TestingDSL}
+\input{chapters/relatedwork}
+\input{chapters/SummaryAndFutureWork}
 
 \end{document}
