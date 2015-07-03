@@ -6196,11 +6196,9 @@ between column types.}%
 \let\IEEEaftertitletext\@IEEESAVECMDIEEEaftertitletext}
 
 
-
 % need a backslash character for typeout output
 {\catcode`\|=0 \catcode`\\=12
-|xdef|@IEEEbackslash{\}}
-
+|xdef|@ijissbackslash{\}}
 
 % hook to allow easy disabling of all legacy warnings
 \def\@IEEElegacywarn#1#2{\typeout{** ATTENTION: \@IEEEbackslash #1 is deprecated (line \the\inputlineno).
