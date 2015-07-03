@@ -13,8 +13,8 @@
 %\documentstyle[12pt,twoside,draft]{IEEEtran}
 %\documentstyle[9pt,twocolumn,technote,twoside]{IEEEtran}
 
-\usepackage[english]{babel}
-\usepackage{blindtext}
+\usepackage[nolist,printonlyused]{acronym}
+
 
 \begin{document}
 
@@ -48,6 +48,7 @@ bla
 Extensible Languages, Domain-Specific Languages, Debuggers, Testing.
 \end{IEEEkeywords}
 
+\input{acronyms}
 \input{chapters/introduction}
 \input{chapters/mbeddr}
 \input{chapters/mbeddrDebugger}
@@ -55,5 +56,8 @@ Extensible Languages, Domain-Specific Languages, Debuggers, Testing.
 \input{chapters/TestingDSL}
 \input{chapters/relatedwork}
 \input{chapters/SummaryAndFutureWork}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
 
 \end{document}
