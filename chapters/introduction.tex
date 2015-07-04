@@ -1,4 +1,9 @@
 \section{Introduction}
+Software development faces the challenge that general purpose languages do not provide the appropriate abstracts for many domains in which they are used. Traditionally there are two major approaches to overcome this issue. One is to use frameworks that provide the domains specific abstractions for the developer. This approach has very limited support for static semantics. Most \acp{GPL} do not support modification of constrains or typesystem. The second is to use external \acp{DSL} to give the developer a language to express solutions to domain problems. This approach has some other drawbacks. \todo{monolithic, all in advanced, central, foo bar}.
+Language engineering with extensible languages provides a solution to theses problems. Instead of having a single monolithic \ac{DSL} extensible languages enable modular and incremental extension of a host language with domain specific abstractions. Those higher abstraction will be reduced to less abstract concepts until they reach the abstraction level of a \ac{GPL}.
+
+Debugging theses higher abstract extension at the same abstraction level as they have been defined in the model is crucial to the user. Because of this the a debugger specification is a crucial part of the extension. They way how the less domain specific extensions to the executed code has to be in place in the language extension. 
+ 
 
 Provide some context and talk about the following things:
 - extensible languages
