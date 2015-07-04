@@ -1,13 +1,21 @@
 \section{mbeddr}
 
 
-The mbeddr open source project focused on supporting embedded software development. It introduces a set of of modular domain-specific extensions to C and also supports other languages for addressing common problems in software development, for example, writing documentation with close integration to code or capturing requirements. mbeddr is build using JetBrains MPS language workbench. MPS supports the definition, composition and use of general purpose or domain specific languages. To archive this MPS uses a projectional editor, this means, even if the notation might look textual it is not represented as a sequence of characters, which are transformed into a AST by parsing. In contrast user actions manipulate the AST directly. The AST is then rendered to the user according to editor specifications/projection rules. These rules are not limited to textual notations, for example can tabular or mathematical notations can be used if appropriated. Since no parsing ambiguities can occur a wide range of languages extension can be used.
+The mbeddr open source project focused on supporting embedded software development. It introduces a set of of modular domain-specific extensions to C and also supports other languages for addressing common problems in software development, for example, writing documentation with close integration to code or capturing requirements. mbeddr is build using JetBrains \ac{MPS} language workbench. \ac{MPS} supports the definition, composition and use of general purpose or domain specific languages. To archive this \ac{MPS} uses a projectional editor, this means, even if the notation might look textual it is not represented as a sequence of characters, which are transformed into a \ac{AST} by parsing. In contrast user actions manipulate the \ac{AST} directly. The \ac{AST} is then rendered to the user according to editor specifications/projection rules. These rules are not limited to textual notations, for example can tabular or mathematical notations can be used if appropriated. Since no parsing ambiguities can occur a wide range of languages extension can be used.
 
-
-
- Markus Voelter. Language and IDE Development, Modularization and Composition with MPS. In GTTSE 2011, LNCS. Springer, 2011.
+\todo{das komische mbeddr diagram hier rein}
+\todo{ ref auf  Markus Voelter. Language and IDE Development, Modularization and Composition with MPS. In GTTSE 2011, LNCS. Springer, 2011.}
 
 \subsection{Languages}
+mbeddr includes a extensible C99 implementation. In addition to plain C mbeddr also include a set of predefined extension on top of C. These extension include test cases, state machines, components and physical units. In \ac{MPS} languages are separated into modular aspects. The major aspects of a language are:  
+
+\parhead{Structure:} Definition of the \ac{AST} of the language.
+
+\parhead{Editor:} Projection rules how the \ac{AST} is presented to the user and how the user interacts with the program.
+
+\parhead{Typesystem/Contrains:} Static semantics of the language.
+ 
+\parhead{Generator:} Dynamic semantics of the language, transforms the model into executable code.
 
 
 C + Extensions 
