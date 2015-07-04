@@ -1,5 +1,15 @@
 \section{Related Work}
 
+Wu et al. describe a unit testing framework for
+\acp{DSL}~\cite{DBLP:conf/dsl/WuGM09}. 
+While they concentrate on testing the semantics of the language, we believe testing
+\acp{DSL} should not only cover the semantics, but also other language
+aspects: editor (concrete syntax), type system, scoping, transformation rules,
+and finally the debugger.\footnote{Specific language workbenches might require
+testing of additional aspects} Those aspects also
+form part of the language implementation and should therefore be tested as well.
+
+
 \ac{GDB}
 
 The \ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
