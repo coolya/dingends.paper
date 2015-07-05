@@ -9,9 +9,6 @@ and finally the debugger.\footnote{Specific language workbenches might require
 testing of additional aspects} Those aspects also
 form part of the language implementation and should therefore be tested as well.
 
-
-\ac{GDB}
-
 The \ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
 Tests for this debugger are written in Python and with the 
 unittest framework that comes with Python.
@@ -28,3 +25,13 @@ write a program in the source-language (mbeddr), compile it to an executable and
 debug it through test cases, which verify the debugging behavior. While the 
 \ac{LLDB} project also tests other aspects with Python scripts, we could invent
 further \acp{DSL} for testing those aspects as well.
+
+The \ac{GDB} provided by the GNU project takes a similar
+appraoch as the \ac{LLDB}: debugger tests are cover different aspects of the
+debugger's functionality and are written in a scripting language~\cite{gdb}.
+While we concentrate on testing the debugging behavior for one extensible
+language, the \ac{GDB} project tests debugging behavior for all of its supported
+languages, such as C, C++, Java, Ada etc. Further, those tests run on different
+platforms and different target configurations. In contrast, we only also support
+writing tests against different platforms, but do not allow users to change the
+target configuration via the \ac{DSL}.
