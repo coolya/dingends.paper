@@ -14,8 +14,8 @@ them as mandatory.
 
 The following list discusses the functional requirements we expect from a
 testing language for debuggers. While \hyperref[FR3]{FR3} is considered
-optional and \hyperref[FR3]{FR3} is mandatory in the embeded software domain, we
-expect \hyperref[FR1]{FR1} and \hyperref[FR2]{FR2} to be essential.
+optional and \hyperref[FR3]{FR3} is mandatory in the embedded software domain,
+we expect \hyperref[FR1]{FR1} and \hyperref[FR2]{FR2} to be essential.
  
 \noindent \textbf{\label{FR1}FR1 Debug state validation:} In our test cases we
 must be able to validate the call stack, and for each of its frames 
@@ -32,13 +32,13 @@ commands and breakpoints, we need the ability to specify stepping commands
 
 In a debugger test cases,
 first, the location where to break is specified. Next, after suspending on this
-location, an otional list of stepping commands is executed. Finally, after
+location, an optional list of stepping commands is executed. Finally, after
 suspending, specified validation rules are evaluated.
 
 \noindent \textbf{\label{FR2}FR2 Automated test execution:} Since we can write
 many different debugger tests, we require the ability to integrate our 
-tests into an automatic execution environemt. This environment can be, \eg
-an \ac{IDE} or a command-line tool. Latter is prefered, since it can be
+tests into an automatic execution environment. This environment can be, \eg
+an \ac{IDE} or a command-line tool. Latter is preferred, since it can be
 executed on the local machine or on a build server.
 
 \noindent \textbf{\label{FR3}FR3 Exchangeability of debugger backends:}
@@ -47,12 +47,12 @@ vendors require different compilers and debuggers.
 Hence, we require the ability to run our tests against
 different debugger backends and on different platforms. To achieve this,
 we expect from the \ac{DSL} the ability to specify the debugger backend
-and the platofrm against/on which tests should executed.
+and the platform against/on which tests should executed.
 
 \subsection{Non-Functional Requirements}
 
 In addition to the functional requirements discussed in the previous section, we
-have also defined sone non-functional requirements: \hyperref[NFR1]{NFR1} to
+have also defined non-functional requirements: \hyperref[NFR1]{NFR1} to
 \hyperref[NFR3]{NFR3}. While \hyperref[NFR2]{NFR2} can be considered optional,
 we consider \hyperref[NFR1]{NFR1} and \hyperref[NFR3]{NFR3} as mandatory for
 testing debugger implementations efficiently.
@@ -80,7 +80,7 @@ require the ability to extend the testing language for contributing our own
 validation rules. Those new rules can be used for testing debugger
 functionality not covered by the language or for writing tests more efficiently.
 
-\noindent \textbf{\label{NFR3}NFR3 Source langauge integration:} Finally,
+\noindent \textbf{\label{NFR3}NFR3 Source language integration:} Finally,
 \ac{DSL} should integrate with programs written in the source language to debug.
 This integration is required for specifying locations to break and for
 validating where the debugger is suspended.
