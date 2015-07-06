@@ -1,8 +1,50 @@
 \section{mbeddr Debugger}
 
+mbeddr comes with an extensible debugger, that allows user to debug code written
+with mbeddr and which can be extended to support debugging of new language
+extensions.
+
 \subsection{Architecture}
 how does the debugger work
 
+Execution Aspect
+
+Specification Aspect
+DSL
+
 
 \subsection{Building Debugging Behavior}
-show how debug support is build for foreach and unit test language
+
+We describe in this section the implementation of debugging behavior for the
+lanuages described in \sect{languageImplementation}. The mbeddr debugger
+comes with a \ac{DSL} for specifying the debugging behavior. 
+We will use the language in this section for
+building debug support for both languages from \sect{languageImplementation}.
+
+\parhead{Breakpoints} We want to be able to set breakpoints on instances of
+\ic{ForEachStatement}, \ic{AssertStatement}, \ic{ItExpression}and
+\ic{ExecuteTestExpression}.
+For doing so, we need to implement the marker interface \ic{IBreakable}. 
+Since the first two concepts
+are derived from \ic{Statement} and this concept already implements this
+interface, we can already set breakpoints on instances of them. The latter two
+concepts will always live inside a statement derived
+from \ic{Statement}. Hence, no further work is necessary.
+
+\parhead{Call Stack} For lifting the call stack we need to specify, which
+concepts have callable semantics or are generated to C functions. First applies
+to \ic{TestCase}, which has callable semantics, but is also trasnalted to a C
+function. In contrast, \ic{ExecuteTestExpression} does not have callable
+semantics, but is translated to a C function. Other concepts are not
+related to the call stack.
+
+\ic{TestCase} , \ic{ExecuteTestExpression} \ic{IStackFrameContributor}
+
+
+
+
+
+
+\parhead{Stepping}
+
+\parhead{Watches}
