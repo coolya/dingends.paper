@@ -12,9 +12,19 @@
 %\documentstyle[twocolumn]{IEEEtran}
 %\documentstyle[12pt,twoside,draft]{IEEEtran}
 %\documentstyle[9pt,twocolumn,technote,twoside]{IEEEtran}
-
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{beramono} % important for nicer code font
+\usepackage{verbatim}
+\usepackage{listings} 
+\usepackage{tikz}
+\usepackage{etoolbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage[nolist,printonlyused]{acronym}
 \usepackage{hyperref}
+
+\newcommand{\changefont}[3]{\fontfamily{#1}\fontseries{#2}\fontshape{#3}\selectfont}
+\newcommand\change{}
 %\newcommand{\mynote}[2]{}
 \newcommand{\mynote}[2]{\textbf{{#1}(}\textit{{#2}}\textbf{)}}
 \newcommand\todo[1]{\mynote{TODO}{#1}} 
@@ -22,6 +32,8 @@
 \newcommand\parhead[1]{\vspace{0.1cm}\noindent\textbf{{#1}}\ \ }  
 \newcommand{\eg}{e.\,g., }
 \newcommand{\ie}{i.\,e., }
+\newcommand{\ic}[1]{\changefont{cmtt}{m}{n}{#1}\normalfont}
+\newcommand{\lcr}[1]{\changefont{cmtt}{m}{n}{#1}\normalfont}
 
 \begin{document}
 
