@@ -1,10 +1,20 @@
 \section{Summary and Future Work}
 
-In this paper we have \ldots
+mbeddr comes with a debugger for extensible languages. To test this debugger, we
+have introduced in this paper a generic testing \ac{DSL}. The language is
+implemented in \ac{MPS} and for mbeddr, but the approach can be applied for
+testing any imperative language debugger. Further, we have shown in this paper 
+(1) the implementation of a language extension, (2) how debugging support is
+build for it and (3) how the debugger is tested with use of our \ac{DSL}. 
+We have designed the language for
+extensibility, so others can contribute their own project-specific validation
+rules. In addition, we concentrated on reuse, so test data, test structures and
+validation rules and can shared among tests.
 
-In the future, we will investigate ways for integrating the debugger specication
-\ac{DSL} with the \ac{DSL} for debugger testing. From this integration we
-expect to (1) gain advances in validating debugger test cases and
+
+In the future, we will investigate ways for integrating the debugger
+specification \ac{DSL} with the \ac{DSL} for debugger testing. From this
+integration we expect to (1) gain advances in validating debugger test cases and
 (2) the possibility to automatically generate test cases from formal debugger 
 specifications (based on work from \cite{conf/kbse/WuG05,henriques05}).
 In addition, we will continue researching on languages for testing
