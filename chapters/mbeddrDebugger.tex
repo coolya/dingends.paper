@@ -1,16 +1,93 @@
 \section{mbeddr Debugger}
 
-mbeddr comes with an extensible debugger, that allows user to debug code written
-with mbeddr and which can be extended to support debugging of new language
-extensions.
+mbeddr comes with a debugger, which allows user to debug code written
+with mbeddr. Since mbeddr is extensible, the debugger is extensible as well for
+enabling debugging of new language extensions.
+
+mbeddr programs can be composed of different languages and form this way
+mixed-languages programs. The debugger for those languages is composed at
+debug-time and allows users to debug their code at the extension-level,
+where the language extensions are used. The debug support is enabled by lifting
+the call stack and program state from the base level to the extension level
+(see \fig{infoFlow}). In contrast, stepping and breakpoints are translated vice
+versa.
+
+\begin{figure}[h]
+  \vspace{-2mm}
+  \centering
+    \includegraphics[width=7cm]{./figures/two-levels.png} 
+    \vspace{-2mm}
+    \caption{Flow of debug information between base and
+    extension level~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}}
+  \label{infoFlow}
+  \vspace{-2mm}
+\end{figure}
+
 
 \subsection{Architecture}
-how does the debugger work
 
-Execution Aspect
+The debugger architecture can be separated into two different aspects: First, a
+\ac{DSL} and a set of interfaces for describing the debugging semantics of
+language constructs. Second, a runtime for executing those descriptions and this
+way performing the mapping described in the~\fig{infoFlow}. 
 
-Specification Aspect
-DSL
+You can find further information about the architecture and how it is
+implemented with \ac{MPS} in \cite{DBLP:conf/adaEurope/AdaEuropeDeb}. In this
+section we discuss the specification part, since that is essential for
+understanding how debuggers are build and later tested.
+
+\fig{specabs} shows the meta-model used for specifying debugging semantics of
+language constructs. Each node is represented in \ac{MPS} by an interface, which
+is implemented by the respective language construct.
+
+\noindent \textbf{Breakpoints} \ic{Breakable}s are consturcts on which we can
+set breakpoints, \eg statements.
+
+\noindent \textbf{Watchables} \ic{WatchProvider} is something that is either
+translated to a lower level watchable (\eg a global variable) or represents a watchable on the
+extension-level.
+Those \ic{WatchProvider}s live inside \ic{WatchProviderScope} (\eg a
+statement list), which can be nested. 
+
+\noindent \textbf{Stepping} \ic{Steppable} is something we can step
+over or into (\eg an expression statement). A so called \ic{SteppingStrategy} is
+a reusable implementation of a specific stepping behavior. It describes based on
+setting breakpoints (the approach is based on~\cite{}) where execution should
+suspend after performing a specific stepping command.
+\ic{Steppable}s can contain \ic{StepIntoable}s
+to which the step into command is delegated (\eg a function call).
+\ic{Steppable} can be contained inside a \ic{SteppableComposite} (\eg a
+statement list).
+
+\noindent \textbf{Call Stack} A \ic{StackFrameContributor} is
+something that has callable semantics on the extension-level or is
+translated to a lower-level callable. While the latter category does not
+contribute any \ic{StackFrame}s to the call stack, the other category
+contributes one to many \ic{StackFrame}s.
+
+
+
+
+
+
+\begin{figure}[h]
+  \vspace{-2mm}
+  \centering
+    \includegraphics[width=9cm]{./figures/debugger-concepts.png} 
+    \vspace{-2mm}
+    \caption{Meta-model used for specying the debugging semantics of language
+    constructs~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}. Colors indicate the
+    different aspects.} 
+  \label{specabs}
+  \vspace{-2mm}
+\end{figure}
+
+The specification \ac{DSL} is a language extension for MPS' Base Language,
+which is an implementation of Java. It is used for describing three
+debugging aspects: stepping, lifting of call stack and program state. Further
+information about the language can be found in
+\cite{DBLP:conf/adaEurope/AdaEuropeDeb}. We will later use this \ac{DSL} for
+building debugging support for our two language extensions. 
 
 
 \subsection{Building Debugging Behavior}
