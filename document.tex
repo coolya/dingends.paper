@@ -28,6 +28,12 @@
 \usepackage{soul}  
 \usepackage{color}
 
+\definecolor{amber}{rgb}{1.0, 0.75, 0.0}
+\definecolor{applegreen}{rgb}{0.55, 0.71, 0.0}
+\definecolor{burntsienna}{rgb}{0.91, 0.45, 0.32}
+\definecolor{cyan}{rgb}{0.0, 1.0, 1.0}
+\definecolor{brandeisblue}{rgb}{0.0, 0.44, 1.0}
+
 \lstset{
 basicstyle=\ttfamily\color{black}, 
 keywordstyle=\color{black}\bfseries,       
@@ -68,7 +74,7 @@ concepts,constraints,can,be,child,ancestor,isNotNull,node,int32_t,executeTests
 % otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
 otherkeywords={},
 alsodigit={0,1,2,3,4,5,6,7,8,9,0},
-stringstyle=\color{OliveGreen},
+stringstyle=\color{green},
 mathescape=true,
 showstringspaces=false,
 sensitive=true,
@@ -80,11 +86,7 @@ basicstyle=\scriptsize\ttfamily\color{darkgray},
 keywordstyle=\bf\scriptsize\ttfamily\color{black},
 }
 
-\definecolor{amber}{rgb}{1.0, 0.75, 0.0}
-\definecolor{applegreen}{rgb}{0.55, 0.71, 0.0}
-\definecolor{burntsienna}{rgb}{0.91, 0.45, 0.32}
-\definecolor{cyan}{rgb}{0.0, 1.0, 1.0}
-\definecolor{brandeisblue}{rgb}{0.0, 0.44, 1.0}
+
 
 \definecolor{grayx11gray}{rgb}{0.75, 0.75, 0.75}
 \definecolor{lavendergray}{rgb}{0.77, 0.76, 0.82}
@@ -113,6 +115,7 @@ keywordstyle=\bf\scriptsize\ttfamily\color{black},
 \newcommand{\lcr}[1]{\changefont{cmtt}{m}{n}{#1}\normalfont}
 \newcommand{\sect}[1]{Section~\ref{#1}}
 \newcommand{\fig}[1]{Fig.~\ref{#1}}
+\newcommand{\lst}[1]{Listing~\ref{#1}}
 
 \begin{document}
 
