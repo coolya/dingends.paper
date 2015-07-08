@@ -52,8 +52,8 @@ statement list), which can be nested.
 \noindent \textbf{Stepping} \ic{Steppable} is something we can step
 over or into (\eg an expression statement). A so called \ic{SteppingStrategy} is
 a reusable implementation of a specific stepping behavior. It describes based on
-setting breakpoints (the approach is based on~\cite{}) where execution should
-suspend after performing a specific stepping command.
+setting breakpoints (the approach is based on~\cite{Wu06grammar}) where
+execution should suspend after performing a specific stepping command.
 \ic{Steppable}s can contain \ic{StepIntoable}s
 to which the step into command is delegated (\eg a function call).
 \ic{Steppable} can be contained inside a \ic{SteppableComposite} (\eg a
