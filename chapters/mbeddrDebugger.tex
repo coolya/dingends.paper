@@ -1,21 +1,23 @@
 \section{mbeddr Debugger}
+\label{mbeddrDebugger}
 
-mbeddr comes with a debugger, which allows user to debug code written
-with mbeddr. Since mbeddr is extensible, the debugger is extensible as well for
-enabling debugging of new language extensions.
+mbeddr comes with a debugger, which allows user to debug their mbeddr code 
+on the abstraction levels of the used languages. Since mbeddr
+is extensible, the debugger is extensible
+as well for enabling debugging of new language extensions.
 
-mbeddr programs can be composed of different languages and form this way
-mixed-languages programs. The debugger for those languages is composed at
-debug-time and allows users to debug their code at the extension-level,
-where the language extensions are used. The debug support is enabled by lifting
-the call stack and program state from the base level to the extension level
-(see \fig{infoFlow}). In contrast, stepping and breakpoints are translated vice
-versa.
+mbeddr programs can be composed of different languages, located on different
+abstractions levels. Language extensions used inside those programs contribute
+so called debugger extensions, which provide debugging support for the language
+itself. This debugging support is implemented specificly for the language by
+lifting the call stack/program state from the base-level to the
+extension-level (see \fig{infoFlow}) and stepping/breakpoints
+vice versa.
 
 \begin{figure}[h]
   \vspace{-2mm}
   \centering
-    \includegraphics[width=7cm]{./figures/two-levels.png} 
+    \includegraphics[width=6cm]{./figures/two-levels.png} 
     \vspace{-2mm}
     \caption{Flow of debug information between base and
     extension level~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}}
@@ -24,44 +26,44 @@ versa.
 \end{figure}
 
 
-\subsection{Architecture}
+\subsection{Framework}
+\label{mbeddrDebuggerFramework}
 
-The debugger architecture can be separated into two different aspects: First, a
-\ac{DSL} and a set of interfaces for describing the debugging semantics of
-language constructs. Second, a runtime for executing those descriptions and this
-way performing the mapping described in the~\fig{infoFlow}. 
+The debugger framework can be separated into two different parts: First, a
+\ac{DSL} and a set of interfaces (shown in \fig{specabs}) for specifying the
+debugging semantics of language constructs. 
+Second, a runtime for executing those specifications and
+this way performing the mapping described in the~\fig{infoFlow}. 
 
 You can find further information about the architecture and how it is
 implemented with \ac{MPS} in \cite{DBLP:conf/adaEurope/AdaEuropeDeb}. In this
-section we discuss the specification part, since that is essential for
-understanding how debuggers are build and later tested.
+section we only discuss the specification part, which is essential for
+understanding how to build a debugger extensions for our language example.
 
-\fig{specabs} shows the meta-model used for specifying debugging semantics of
-language constructs. Each node is represented in \ac{MPS} by an interface, which
-is implemented by the respective language construct.
+\noindent \textbf{Breakpoints} \ic{Breakable}s are language consturcts on which
+we can set breakpoints (\eg \ic{Statement}s).
 
-\noindent \textbf{Breakpoints} \ic{Breakable}s are consturcts on which we can
-set breakpoints, \eg statements.
+\noindent \textbf{Watchables} A \ic{WatchProvider} is either
+translated to a lower level watchable (\eg  \ic{GlobalVariableDeclaration}) or
+represents a watchable on the extension-level.
+Each of them lives inside an \ic{WatchProviderScope} (\eg
+\ic{StatementList}), which is nestable. 
 
-\noindent \textbf{Watchables} \ic{WatchProvider} is something that is either
-translated to a lower level watchable (\eg a global variable) or represents a watchable on the
-extension-level.
-Those \ic{WatchProvider}s live inside \ic{WatchProviderScope} (\eg a
-statement list), which can be nested. 
-
-\noindent \textbf{Stepping} Lower level breakpoints are used for realizing
-stepping behavior (approach is based on~\cite{Wu06grammar}). The concrete
-stepping implementation is encapsulated in \ic{SteppingStrategies}. Those strategies are
-contributed by \ic{Steppable}s, which are langauge constructs,
-on which we can step over or into (\eg an expression statement). 
-Step into is possible on them, if they contain \ic{StepIntoable}s
-(\eg a function call). \ic{Steppable} can be contained inside a
-\ic{SteppableComposite} (\eg a statement list).
+\noindent \textbf{Stepping} Log level breakpoints are used for realizing
+stepping (approach is based on~\cite{Wu06grammar}). Concrete
+stepping implementations are encapsulated in
+\ic{SteppingStrategies}.
+Those strategies are contributed by \ic{Steppable}s, on those 
+we can \emph{step over} or \emph{into} (\eg \ic{ExpressionStatement}). 
+However, \emph{step into} is relevant if 
+they contain \ic{StepIntoable}s, something to step into
+(\eg \ic{FunctionCall}). Finally, a \ic{Steppable} always lives inside a
+\ic{SteppableComposite} (\eg \ic{StatementList}), which is nestable.
 
 \noindent \textbf{Call Stack} A \ic{StackFrameContributor} is
 something that has callable semantics on the extension-level or is
 translated to a lower-level callable. While the latter category does not
-contribute any \ic{StackFrame}s to the call stack, the other category
+contribute any \ic{StackFrame}s to the high level call stack, the other category
 contributes one to many \ic{StackFrame}s.
 
 \begin{figure}[h]
@@ -76,130 +78,72 @@ contributes one to many \ic{StackFrame}s.
   \vspace{-2mm}
 \end{figure}
 
-The specification \ac{DSL} is a language extension for MPS' Base Language,
-which is an implementation of Java. It is used for describing three
-debugging aspects: stepping, lifting of call stack and program state. Further
-information about the language can be found in
-\cite{DBLP:conf/adaEurope/AdaEuropeDeb}. We will later use this \ac{DSL} for
-building debugging support for our two language extensions. 
-
-
 \subsection{Building Debugging Behavior}
 
-We describe in this section the implementation of minimal debugging behavior for
-the lanuages described in \sect{languageImplementation}. The mbeddr debugger
-comes with a \ac{DSL} for specifying the debugging behavior. 
-We will use the abstractions shown in \fig{specabs} and the \ac{DSL} for
-building debug support for both languages from \sect{languageImplementation}.
+We describe in this section the implementation of a minimal debugger
+for our unit test lanuage. The debugger framework comes with a \ac{DSL}
+for specifying the debugging behavior. We will use this \ac{DSL} and the
+abstractions shown in \fig{specabs} for building the debugging support.
 
 \parhead{Breakpoints}  We want to be able to set breakpoints on instances of
-\ic{ForEachStatement} and \ic{AssertStatement}.
-For being able to, we need to implement the marker interface \ic{IBreakable} in
-both concepts. Since both concepts
-are derived from \ic{Statement} and this concept already implements this
-interface, we can already set breakpoints on instances of them.
-Hence, no further work is necessary.
+\ic{AssertStatement}. For being able to, we only need to implement the marker
+interface \ic{IBreakable}. Since this concept
+is derived from \ic{Statement} which already implements this
+interface, we can already set breakpoints on instances of \ic{AssertStatement}.
 
 \parhead{Call Stack} For lifting the call stack we need to specify, which
 concepts have callable semantics or are generated to C functions. 
 \ic{TestCase} has callable semantics and is trasnalted to a C
 function. In contrast, \ic{ExecuteTestExpression} does not have callable
 semantics, but is translated to a C function. We therefore implement 
-\ic{IStackFrameContributor} in both concepts, but differently.
+\ic{IStackFrameContributor} in both concepts.
 
-In the debugger runtime we link instances of \ic{ExecuteTestExpression} to
-low level stack frames by implementing \ic{contributeFrameMappings} this way:
+The listing below shows how we link instances of
+\ic{ExecuteTestExpression} to low level stack frames. In addition to this, we
+tell the debugger runtime to hide the stack frame from the high-level call stack.
 
-\begin{lstlisting}[language=mbeddr]
+\begin{lstlisting}[language=mbeddr,frame=single]
 contribute frame mapping for frames.select(name=getName());
 \end{lstlisting}
 
-Further, we return \ic{false} in \ic{isDSLStackFrame}. This query
-hides the stack frame from the high-level call stack.
 
 The mapping for \ic{TestCase} is more complex. Here we also start similarly by
-linking the low level stack to the \ic{TestCase} instance by
-implementing \ic{contributeFrameMappings}. Next, we return \ic{true} in
-\ic{isDSLStackFrame}, since the frame should be shown in high level stack.
-Finally, \ic{getStackFrameName} returns the name of the actual \ic{TestCase}.
-Consider our example \lst{lst:generatedForEach}, where we would lift the frame
-\ic{test\_forEach} to \ic{forEach}.
+linking the low level stack to the \ic{TestCase} instance. But, we tell the
+debugger runtime to show the stack frame in the high-level call stack.
+Further, we provide the name of the actual \ic{TestCase}, which is shown in the
+call stack view: Consider our example \lst{lst:generatedUT}, where we would
+lift the frame \ic{test\_forTest} to \ic{forTest}.
 
-\parhead{Stepping} As described before, stepping is implemented based on setting
-low-level breakpoints on the location where execution should suspend after
-performing the stepping command. \ic{AsserStatement} is a \ic{Statement}, which
-provides already step over behavior, therefore we only need to implement step
-into in \ic{contributeStepIntoStrategies}:
-
-\begin{lstlisting}[language=mbeddr]
+\parhead{Stepping} As described in \sect{mbeddrDebuggerFramework}, stepping is
+implemented by setting low-level breakpoints on the 
+location where execution should suspend after
+performing a stepping command. \ic{AsserStatement} is a \ic{Statement}, which
+already provides \emph{step over} behavior. However, we want to be able to 
+\emph{step into} \ic{expr}, in case it contains something to step into. 
+Therefore we overwrite \ic{Statement}'s \emph{step into} behavior: 
+\begin{lstlisting}[language=mbeddr,frame=single]
 break on nodes to step-into: this.expr;
 \end{lstlisting}
 
-This statement from our debugger \ac{DSL} searches in \ic{this.expr} (the
-assert condition in the \ac{AST}) for instances of \ic{StepIntoable} and
-collects their step into strategies. 
+\ic{break on nodes} searches in \ic{this.expr} (the assert's condition inside
+the \ac{AST}) for instances of \ic{StepIntoable} and contributes their 
+\emph{step into} strategies. Next, in \ic{ExecuteTestExpression}, we overwrite
+the \emph{step into} behavior in a similar way.
 
-Next, we implement \ic{StepIntoable} in \ic{TestCaseRef}. In 
-\ic{contributeStepIntoStrategies} we put a breakpoint on the first statement
-inside the \ic{TestCase}'s body:
-
-\begin{lstlisting}[language=mbeddr]
+For being able to \emph{step into} \ic{TestCase}s we implement
+\ic{StepIntoable} in \ic{TestCaseRef}. In a minimal implementation we simply put
+a breakpoint on the first statement in the \ic{Testcase}'s body:
+\begin{lstlisting}[language=mbeddr,frame=single]
 break on node: this.testcase.body.statements.first;
 \end{lstlisting}
 
-In terms of stepping is the implementation of our \ic{ForEachStatement} more
-complex. Since this statement contains other statements inside its body,
-we implement both, \ic{Steppable} (transitive via \ic{Statement}) and
-\ic{SteppableComposite}. We overwrite \ic{contributeStepOverStrategies} and
-(1) delegate to our \ic{SteppableComposite} to break on the next statement and
-(2) on the body (a \ic{StatementList}):
-\begin{lstlisting}[language=mbeddr]
-  break on next(drops-frame = false); 
-  break on node: this.body; 
-\end{lstlisting}
-
-Next, \ic{contributeStepIntoStrategies} is overwritten by searching in \ic{len}
-aand \ic{array} (both are \ic{Expression}s) for \ic{StepIntoables}:
-\begin{lstlisting}[language=mbeddr]
-  break on nodes to step-into: this.len; 
-  break on nodes to step-into: this.array; 
-\end{lstlisting}
-
-Finally, we implement \ic{contributeStepOverStrategiesForChildren} for our
-contained \ic{Steppables}. This method is invoked when stepping inside the
-\ic{ForEachStatement}:
+\parhead{Watches} \ic{ExecuteTestExpression} is translated to C 
+variables, however, those are not considered since the
+corresponding stack frame is not shown in the call stack. In
+contrast, \ic{TestCase} generates the \ic{LocalVariableDeclaration}
+\emph{\_fails}, which we hide from
+the watchables view (the C watchable would be shown otherwise):
 
 \begin{lstlisting}[frame=single,language=mbeddr]
-  break on next(drops-frame = dropsFrame); 
-  break on node: this.body; 
+hide local variable with identifier "_fails";
 \end{lstlisting}
-
-\parhead{Watches} For the lifting of watchables, we only care about
-\ic{TestCase} and \ic{ForEachStatement}. \ic{ExecuteTestExpression} is also
-translated to lower level watchables, but these are not considered since the
-corresponding stack frame is not shown in the call stack. \ic{TestCase}
-generates the \ic{LocalVariable} \ic{\_fails} we want to hide via the following
-\ic{DSL} construct:
-
-\begin{lstlisting}[frame=single,language=mbeddr]
-hide local variable with identifier "\_fails";
-\end{lstlisting}
-
-Next, \ic{ForEachStatement} hides \ic{LocalVariable} \ic{\_fails} in the same
-way as \ic{TestCase}. In addition, we want to show value of \ic{it} by using the
-\ic{map by name} construct:
-
-\begin{lstlisting}[frame=single,language=mbeddr]
-map by name "\_it" to "it" 
-  type mapper: this.array.type:ArrayType.baseType 
-  icon provider: this 
-  C variable kinds: local variable 
-  category name: "local variables" 
-  highlighted node: this
-\end{lstlisting}
-
-We lift a local variable with name "\_it" to "it" and query the
-watchable value from  array's base type. In addition, we provide an icon (shown
-in the view), group the watchable inside the view with other local variables
-and highlight the \ic{ForEachStatement} when someone click on the
-watchable.

@@ -60,17 +60,8 @@ columns=flexible,                       % Column format
 morekeywords={}  
 } 
  
- 
-\lstdefinelanguage{mbeddr}
-{keywords={return,test,case,exported,int8_t,foreach,it,int32,void,sized,assert,rule,as,
-applicable,concept,overrides,do,typeof,if,applicable,error,int64_t,int8, for,
-concepts,constraints,can,be,child,ancestor,isNotNull,node,int32_t,executeTests
-% assert(0),assert(1),assert(2),assert(3),assert(4),
-% assert(5),assert(6),assert(7),assert(8),assert(9),assert(10),assert(11),assert(12),
-% assert(13),assert(14),assert(15),assert(16),assert(17),assert(18),assert(19),assert(20),
-% assert(21),assert(22),assert(23),assert(24),assert(25),assert(26),assert(27),assert(28),
-% assert(29),assert(30)
-},
+ \lstdefinelanguage{reducedMbeddr}
+{keywords={},
 % otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
 otherkeywords={},
 alsodigit={0,1,2,3,4,5,6,7,8,9,0},
@@ -86,7 +77,35 @@ basicstyle=\scriptsize\ttfamily\color{darkgray},
 keywordstyle=\bf\scriptsize\ttfamily\color{black},
 }
 
+\lstdefinelanguage{mbeddr}
+{keywords={return,test,case,exported,int8_t,foreach,it,int32,void,sized,assert,rule,as,
+applicable,concept,overrides,do,typeof,if,applicable,error,int64_t,int8, for,
+concepts,constraints,can,be,child,ancestor,isNotNull,node,int32_t,executeTests,
+for,string,foreach
+% assert(0),assert(1),assert(2),assert(3),assert(4),
+% assert(5),assert(6),assert(7),assert(8),assert(9),assert(10),assert(11),assert(12),
+% assert(13),assert(14),assert(15),assert(16),assert(17),assert(18),assert(19),assert(20),
+% assert(21),assert(22),assert(23),assert(24),assert(25),assert(26),assert(27),assert(28),
+% assert(29),assert(30)
+},
+% otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
+otherkeywords={},
+alsodigit={0,1,2,3,4,5,6,7,8,9,0},
+stringstyle=\color{black},
+mathescape=true,
+showstringspaces=false,
+sensitive=true,
+tabsize=2,
+columns=fullflexible,
+morestring=[b]",
+comment=[l]{//},
+basicstyle=\scriptsize\ttfamily\color{darkgray},
+keywordstyle=\bf\scriptsize\ttfamily\color{black},
+}
 
+\newcommand{\lcolorbox}[2]{%
+  \hspace*{-\fboxsep}\colorbox{#1}{#2}%
+}
 
 \definecolor{grayx11gray}{rgb}{0.75, 0.75, 0.75}
 \definecolor{lavendergray}{rgb}{0.77, 0.76, 0.82}
