@@ -54,17 +54,25 @@ we only care about \ic{Structure}, \ic{Generator} and constraints expressed in
 
 \subsection{Unit Test Language Extension}
 
-In this section we implement a unit test language
+In this section we will build a language extension
 for writing test cases with mbeddr.\footnote{The language design is derivded 
-from mbeddr's \ic{unittest} language.}  For the resulting language we will later
-build debugging support and test the debugger implementation.
+from mbeddr's \ic{unittest} language.}  In the later sections we will show
+how to build debugging support for this langauge and how to test its debugging
+support.
 
 \noindent \textbf{Structure:}
 
-\ic{AssertStatemnt}
-\ic{TestCase}
-\ic{TestCaseRef}
-\ic{ExecuteTestExpression}
+\fig{fig:UnitTestStructure} shows the language structure, which we discuss now
+in detail. \ic{AssertStatement} is derived from \ic{Statement} and can therefore
+be used where \ic{Statement}s are epected. It contains an \ic{Expression}, which
+represents the \emph{condition}.
+\ic{TestCase} holds a \ic{StatementList}, which contains the \ic{Statement}s
+that make up the test. Further, \ic{TestCase} implements \ic{IModuleContent},
+which makes the concept usable on top level of mbeddr \ic{Module}s (a
+compilation unit). Other subconcepts of this marker interface are 
+\ic{GlobalVariableDeclartion} or \ic{Function}.
+An \ic{ExecuteTestExpression} is an \ic{Expression} and contains a list of
+\ic{TestCaseRef}. Those references refer to \ic{TestCase} to be executed.
 
 \begin{figure}[h]
   \vspace{-2mm}
@@ -102,18 +110,12 @@ check(typeof(executeTestExpression) :==: <Int32tType()>);
 
 \parhead{Generator:}
 
-The generator translates code written with our language directly to C. Each
-language construct therefore has its own reduction rule. While \ic{MPS}'
-generator language is too complex for showing those reduction rules here, we
-describe each of them in prosa and show in an example how the generated
-structure looks like.
-
- \lst{lst:generatedUT} shows a code
-snippet.
-
-\begin{lstlisting}[language=reducedMbeddr]
-	[int32 sum = 0;] onAssignment
-\end{lstlisting}
+Our generator consists of many different transformation rules, which translate  
+code written with our language directly to mbeddr C. \lst{lst:generatedUT} shows
+on the left hand side an example program, written with mbeddr C and our language
+extension. The right hand side shows the resulting C program. While
+regular mbeddr code is not colored, the boxes show how \ac{AST} nodes from the
+left are translated to C code on the right.
 
 \noindent 
 \hspace{1.2mm}
