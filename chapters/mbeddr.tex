@@ -38,8 +38,11 @@ can occur a wide range of languages extension can be supported.
 mbeddr includes a extensible C99 implementation. In addition to plain C 
 mbeddr also include a set of predefined extension on top of C. These 
 extension include test cases, state machines, components and physical units. 
-In \ac{MPS} languages are separated into modular aspects. The major aspects 
-of a language are:  
+In \ac{MPS}, languages are separated into modular aspects. 
+The major aspects 
+of a language are described below. However, for building debugging support
+we only care about \ic{Structure}, \ic{Generator} and constraints expressed in  
+\ic{Type System/Contraints}.
 
 \parhead{Structure:} Definition of the \ac{AST} of the language.
 
@@ -51,76 +54,127 @@ of a language are:
 
 \subsection{Unit Test Language Extension}
 
-This section shows the implementation of a minimal unit test language for
-writing test cases with mbeddr. \lst{lst:generatedUT} shows a code
+In this section we implement a unit test language
+for writing test cases with mbeddr.\footnote{The language design is derivded 
+from mbeddr's \ic{unittest} language.}  For the resulting language we will later
+build debugging support and test the debugger implementation.
+
+\noindent \textbf{Structure:}
+
+\ic{AssertStatemnt}
+\ic{TestCase}
+\ic{TestCaseRef}
+\ic{ExecuteTestExpression}
+
+\begin{figure}[h]
+  \vspace{-2mm}
+  \centering
+    \includegraphics[width=8.5cm]{./figures/umldiag.png} 
+    \vspace{-2mm}
+    \caption{Language structure}
+  \label{fig:UnitTestStructure}
+  \vspace{-2mm}
+\end{figure}
+
+\parhead{Type System/Constraints:}
+
+For implementing our \ic{AssertStatemnt} we require a constraint and a type
+system rule. First restricts the usages only inside \ic{TestCase}s, meaning an
+\ic{AssertStatemnt} must always live inside (considering the \ic{AST}) a
+\ic{TestCase}:
+\begin{lstlisting}[language=mbeddr,frame=single]
+parentNode.ancestor<concept = TestCase, +>.isNotNull
+\end{lstlisting}
+
+Second restricts the type of its child \ic{expr} (the condition) to
+\ic{BooleanType}, so only valid \emph{conditions} can be entered:
+\begin{lstlisting}[language=mbeddr,frame=single]
+check(typeof(assertStatement.expr) :<=: <BooleanType()>);
+\end{lstlisting}
+
+Since \ic{ExecuteTestExpression} is an expression, which returns a value (the
+number of failures), we specify \ic{Int32tType} as its type (see rule below). We
+will later use the same type inside the code generator.
+\begin{lstlisting}[language=mbeddr,frame=single]
+check(typeof(executeTestExpression) :==: <Int32tType()>);
+\end{lstlisting}
+
+
+\parhead{Generator:}
+
+The generator translates code written with our language directly to C. Each
+language construct therefore has its own reduction rule. While \ic{MPS}'
+generator language is too complex for showing those reduction rules here, we
+describe each of them in prosa and show in an example how the generated
+structure looks like.
+
+ \lst{lst:generatedUT} shows a code
 snippet.
 
-\noindent 
-\begin{minipage}[t]{120pt} 
 \begin{lstlisting}[language=reducedMbeddr]
+	[int32 sum = 0;] onAssignment
+\end{lstlisting}
+
+\noindent 
+\hspace{1.2mm}
+\begin{minipage}[t]{120pt} 
+\begin{lstlisting}[language=reducedMbeddr,numbers=left]
 int32 main(int32 argc,
 		string[] argv) {
    return $\colorbox{g1}{test[}$$\colorbox{g6}{forTest}$$\colorbox{g1}{]}$;
 }
-$\colorbox{white}{\hspace{2mm}{\color{white}\_fails;}}$
+$\colorbox{white}{\hspace{2mm}{\color{white}\_f;}}$
 $\colorbox{white}{\hspace{2mm}{\color{white}blockexpr\_2();}}$
 $\colorbox{white}{\hspace{2mm}{\color{white}\}}}$
 $\colorbox{white}{\hspace{2mm}{\color{white}\}}}$
 $\colorbox{white}{\hspace{2mm}{\color{white}int32\_t bp\_2() \{}}$ 
-$\colorbox{white}{\hspace{2mm}{\color{white}i32\_t \_fails = 0;}}$		
-
-
+$\colorbox{white}{\hspace{2mm}{\color{white}i32\_t \_f = 0;}}$		
 
 $\colorbox{g7}{testcase forTest \{}$ 
 $\colorbox{white}{\hspace{2mm}{\color{white}|}}$
    int32 sum = 0;
+$\colorbox{g3}{\hspace{2.5mm}assert:}$ sum == 0$\colorbox{g3}{;}$   
    int32[] nums = {1, 2, 3};
    for(int32_t i=0;i<3;i++){
      sum += nums[i];
    }
-$\colorbox{g3}{\hspace{2.5mm}assert-equals sum == 3;}$
-$\colorbox{white}{{\color{white}\_fails++;}}$
-$\colorbox{white}{\hspace{5mm}{\color{white}pf("fal:\%d!3");}}$
-$\colorbox{white}{\hspace{2mm}{\color{white}\}}}$
-$\colorbox{white}{\hspace{2mm}{\color{white}return \_fails;}}$
+$\colorbox{g3}{\hspace{2.5mm}assert:}$ sum == 6$\colorbox{g3}{;}$
+$\colorbox{white}{{\color{white}\_f++;}}$
 $\colorbox{g7}{\}}$
 \end{lstlisting}
 \end{minipage} 
-\hfill 
-\rule[-61ex]{0.2ex}{27.2em}
-\begin{minipage}[t]{130pt} 
-\begin{lstlisting}[language=reducedMbeddr]
+\rule[-53ex]{0.1ex}{24.0em}
+\hspace{0.75mm}
+\begin{minipage}[t]{125pt} 
+\begin{lstlisting}[language=reducedMbeddr,numbers=left]
 int32_t main(int32_t argc,
 		char *(argv[])) {
    return $\colorbox{g1}{blockexpr\_2()}$;
 }  
 $\colorbox{white}{\hspace{2.5mm}{\color{white}|}}$
 $\colorbox{g1}{int32\_t blockexpr\_2(void) \{}$
-$\colorbox{g1}{\hspace{2.5mm}int32\_t \_fails = 0;}$
-$\colorbox{g6}{\hspace{2.5mm}\_fails += test\_forTest();}$
-$\colorbox{g1}{\hspace{2.5mm}return \_fails;}$
+$\colorbox{g1}{\hspace{2.5mm}int32\_t \_f = 0;}$
+$\colorbox{g6}{\hspace{2.5mm}\_f += test\_forTest();}$
+$\colorbox{g1}{\hspace{2.5mm}return \_f;}$
 $\colorbox{g1}{\}}$
 
-
-
 $\colorbox{g7}{int32\_t test\_forTest() \{}$
-$\colorbox{g7}{\hspace{2.8mm}int32\_t \_fails = 0;}$
+$\colorbox{g7}{\hspace{2.8mm}int32\_t \_f = 0;}$
    int32_t sum = 0;
+$\colorbox{g3}{\hspace{2.8mm}if(!(}$sum == 0$\colorbox{g3}{)) \{ \_f++; \}}$
    int32_t[] nums = {1, 2, 3};
    for(int32_t i=0;i<3;i++){
      sum += nums[i];
    }
-$\colorbox{g3}{\hspace{2.8mm}if (!(sum == 3)) \{}$
-$\colorbox{g3}{\hspace{5.8mm}\_fails++;}$
-$\colorbox{g3}{\hspace{5.8mm}printf("fail:\%d!=3",sum);}$
-$\colorbox{g3}{\hspace{2.8mm}\}}$
-$\colorbox{g7}{\hspace{2.8mm}return \_fails;}$
+$\colorbox{g3}{\hspace{2.8mm}if(!(}$sum == 6$\colorbox{g3}{)) \{ \_f++; \}}$
+$\colorbox{g7}{\hspace{2.8mm}return \_f;}$
 $\colorbox{g7}{\}}$
 \end{lstlisting}
 \end{minipage} 
 \vspace{-1mm}
-\begin{lstlisting}[caption=Example mbeddr program using the unit test language
-on the left and the C code that has been generated from it on the right.,
-language=mbeddr,label=lst:generatedUT]
+\begin{lstlisting}[caption={Example mbeddr program using the unit test language
+on the left and the C code that has been generated from it on the right. Empty
+lines on the left have no meaning, they are used for showing the relationship
+between high-level and generated code.},language=mbeddr,label=lst:generatedUT]
 \end{lstlisting}
 

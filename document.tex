@@ -60,7 +60,25 @@ columns=flexible,                       % Column format
 morekeywords={}  
 } 
  
- \lstdefinelanguage{reducedMbeddr}
+ \lstdefinelanguage{debuggerTesting}
+{keywords={},
+% otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
+otherkeywords={[,]},
+alsodigit={0,1,2,3,4,5,6,7,8,9,0},
+stringstyle=\color{green},
+mathescape=true,
+showstringspaces=false,
+sensitive=true,
+tabsize=2,
+columns=fullflexible,
+morestring=[b]",
+comment=[l]{//},
+basicstyle=\scriptsize\ttfamily\color{darkgray},
+keywordstyle=\bf\scriptsize\ttfamily\color{black},
+}
+
+
+\lstdefinelanguage{reducedMbeddr}
 {keywords={},
 % otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
 otherkeywords={},
