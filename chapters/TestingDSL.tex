@@ -1,8 +1,40 @@
 \section{Testing DSL}
 
+Our language for testing debuggers is integrated in \ic{MPS} and interacts
+with mbeddr's debugger \ic{API}. While our language could in theory interacts
+with a generic debugger \ic{API}, we have not yet considered efforts for
+investigating that direction.
+
 \subsection{Language Design}
-DSL zum beschreiben von Debugger verhalten, die ist erweiterbar integriert Debugger mit C + Extensions
-	Beschreibt das verhalten auf der Abstraction der Erweiterung von C und nicht auf C level 
+
+\ac{MPS} comes already with a languae for writing type system and editor tests.
+Its \ac{MPS} integration allows users to (1) execute tests automatically from
+within the \ac{IDE} and (2) get the results of executed tests visualized in a
+particular view component. All of that functionality is build for implementors
+of \ic{ITestCase}. By implementing this interface in our , 
+We get the same functionaltiy for free (\hyperref[O3]{O3}), by implementing this
+interface in \ic{DebuggerTest}, which serves as container for
+\ic{DebuggerTestCase}s.
+
+
+\ic{IDebuggerTestContent}
+\ic{DebuggerTestReference}
+\ic{CallStackDeclaration}
+\ic{WatchablesDeclaration}
+
+\ic{DebuggerTestcase}
+	-> \emph{abstract} -> 
+	-> \emph{extends} -> \ic{DebuggerTestcaseReference} 
+	-> \ic{SuspensionPointConfiguration}
+	-> \ic{SteppingConfiguration}
+	-> \ic{ValidationConfiguration}
+
+
+
+DSL zum beschreiben von Debugger verhalten, 
+die ist erweiterbar integriert Debugger mit C + Extensions
+Beschreibt das verhalten auf der Abstraction 
+der Erweiterung von C und nicht auf C level 
 	
 \subsection{Testing Example}
 Sample
