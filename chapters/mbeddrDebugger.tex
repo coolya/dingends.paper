@@ -1,15 +1,13 @@
-\section{mbeddr Debugger}
+\section{mbeddr Debugger Framework}
 \label{mbeddrDebugger}
+\label{mbeddrDebuggerFramework}
 
-mbeddr comes with a debugger, which allows user to debug their mbeddr code 
-on the abstraction levels of the used languages. Since mbeddr
-is extensible, the debugger is extensible
-as well for enabling debugging of new language extensions.
-
-mbeddr programs can be composed of different languages, located on different
-abstractions levels. Language extensions used inside those programs contribute
-so called debugger extensions, which provide debugging support for the language
-itself. This debugging support is implemented specificly for the language by
+mbeddr comes with a debugger, which allows users to debug their mbeddr code 
+on the abstraction levels of the used languages. For that, each language
+contributes a debugger extension, which is build with a framework also provided
+by mbeddr~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}.
+% will be fixed by aoun ! :-)
+Debugging support is implemented specificly for the language by
 lifting the call stack/program state from the base-level to the
 extension-level (see \fig{infoFlow}) and stepping/breakpoints
 vice versa.
@@ -17,7 +15,7 @@ vice versa.
 \begin{figure}[h]
   \vspace{-2mm}
   \centering
-    \includegraphics[width=6cm]{./figures/two-levels.png} 
+    \includegraphics[width=5.5cm]{./figures/two-levels.png} 
     \vspace{-2mm}
     \caption{Flow of debug information between base and
     extension level~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}}
@@ -26,8 +24,6 @@ vice versa.
 \end{figure}
 
 
-\subsection{Framework}
-\label{mbeddrDebuggerFramework}
 
 The debugger framework can be separated into two different parts: First, a
 \ac{DSL} and a set of interfaces (shown in \fig{specabs}) for specifying the
@@ -78,7 +74,7 @@ contributes one to many \ic{StackFrame}s.
   \vspace{-2mm}
 \end{figure}
 
-\subsection{Building Debugging Behavior}
+\section{Debugger Extension for Unit Testing}
 
 We describe in this section the implementation of a minimal debugger
 for our unit test lanuage. The debugger framework comes with a \ac{DSL}

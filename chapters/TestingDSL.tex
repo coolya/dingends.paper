@@ -1,33 +1,54 @@
 \section{Testing DSL}
 
 Our language for testing debuggers is integrated in \ic{MPS} and interacts
-with mbeddr's debugger \ic{API}. While our language could in theory interacts
-with a generic debugger \ic{API}, we have not yet considered efforts for
-investigating that direction.
+with mbeddr's debugger \ic{API}. While this language is currently tightly
+coupled to mbeddr, it could in theory interact with a generic debugger \ic{API},
+however, we have not yet investigated efforts for going into this direction.
 
 \subsection{Language Design}
 
-\ac{MPS} comes already with a languae for writing type system and editor tests.
-Its \ac{MPS} integration allows users to (1) execute tests automatically from
-within the \ac{IDE} and (2) get the results of executed tests visualized in a
-particular view component. All of that functionality is build for implementors
-of \ic{ITestCase}. By implementing this interface in our , 
-We get the same functionaltiy for free (\hyperref[O3]{O3}), by implementing this
-interface in \ic{DebuggerTest}, which serves as container for
-\ic{DebuggerTestCase}s.
+\ac{MPS} comes already with the language \ic{mps.lang.test} for writing type
+system and editor tests.
+Its \ac{MPS} integration allows users to (1) execute tests \emph{automatically}
+from within the \ac{IDE} and (2) get the results of executed tests visualized in a
+table view. All of that functionality is build for implementors
+of \ic{ITestCase} - an interface from \ic{mps.lang.test}. By implementing it
+in \ic{DebuggerTest} (our container for
+\ic{DebuggerTestCase}s), we get the \ic{IDE} integration 
+(\hyperref[O3]{O3}).
 
+\ic{DebuggerTest} \emph{contains} \ic{IDebuggerTestContent}s, which is
+implemented by \ic{DebuggerTestCase}. This way we can instanciate
+\ic{DebuggerTestCase}s, but also other implementors of this interface
+(enables extensibility \hyperref[O2]{O2}). Further, a \ic{DebuggerTest}
+specifies an \emph{mbeddr binary} to debug (compiled with debug symbols before
+executing tets), a \emph{C debugger backend} to use (\hyperref[M1]{M1}) and
+\emph{imports} of other \ic{DebuggerTest}s (enables reuse \hyperref[O1]{O1}).
 
-\ic{IDebuggerTestContent}
-\ic{DebuggerTestReference}
-\ic{CallStackDeclaration}
-\ic{WatchablesDeclaration}
+\ic{CallStackDeclaration} is another implementor of \ic{IDebuggerTestContent}
+and is used for declaring a stack of \ic{IStackFrame}s. Each frame specifies a
+\emph{name}, visible \emph{watchables} and the \emph{location} where suspended.
+We currently have two implementors of this interface: \ic{StackFrameDeclaration}
+and \ic{SubStackFrame}, which extends a declaration. 
+Since a \ic{CallStackDeclaration} can extend another declaration
+\ic{CallStackDeclaration}, we use \ic{SubStackFrame} to specialize properties of
+the extended \ic{StackFrameDeclaration}. In addition, the extending
+\ic{CallStackDeclaration} can declare additional \ic{CallStackDeclaration}s in
+the stack. 
 
-\ic{DebuggerTestcase}
+\ic{IWatchables}, \ic{WatchablesDeclaration}, \ic{AnyWatchables}
+\ic{ISuspendLocation}, \ic{AnyLocation}, \ic{ProgramMarkerReference}
+\ic{IStackFrameName}, \ic{AnyStackFrameName}, \ic{SpecificStackFrameName}
+
+\ic{DebuggerTestCase}
 	-> \emph{abstract} -> 
 	-> \emph{extends} -> \ic{DebuggerTestcaseReference} 
 	-> \ic{SuspensionPointConfiguration}
 	-> \ic{SteppingConfiguration}
 	-> \ic{ValidationConfiguration}
+
+ 
+\ic{DebuggerTestReference}
 
 
 
