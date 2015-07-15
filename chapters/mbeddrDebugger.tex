@@ -36,31 +36,33 @@ implemented with \ac{MPS} in \cite{DBLP:conf/adaEurope/AdaEuropeDeb}. In this
 section we only discuss the specification part, which is essential for
 understanding how to build a debugger extensions for our language example.
 
-\noindent \textbf{Breakpoints} \ic{Breakable}s are language consturcts on which
+\noindent \textbf{Breakpoints} \ic{Breakable}s are concepts on which
 we can set breakpoints (\eg \ic{Statement}s).
 
-\noindent \textbf{Watchables} A \ic{WatchProvider} is either
-translated to a lower level watchable (\eg  \ic{GlobalVariableDeclaration}) or
-represents a watchable on the extension-level.
-Each of them lives inside an \ic{WatchProviderScope} (\eg
-\ic{StatementList}), which is nestable. 
+\noindent \textbf{Watchables} \ic{WatchProvider}s are
+translated to low-level watchables (\eg \ic{GlobalVariableDeclaration}) or
+represent watchables on the extension-level.
+They are declared inside \ic{WatchProviderScope}s (\eg
+\ic{StatementList}), which define their scope.
 
-\noindent \textbf{Stepping} Log level breakpoints are used for realizing
-stepping (approach is based on~\cite{Wu06grammar}). Concrete
-stepping implementations are encapsulated in
-\ic{SteppingStrategies}.
-Those strategies are contributed by \ic{Steppable}s, on those 
-we can \emph{step over} or \emph{into} (\eg \ic{ExpressionStatement}). 
-However, \emph{step into} is relevant if 
-they contain \ic{StepIntoable}s, something to step into
-(\eg \ic{FunctionCall}). Finally, a \ic{Steppable} always lives inside a
-\ic{SteppableComposite} (\eg \ic{StatementList}), which is nestable.
+\noindent \textbf{Stepping} \ic{Steppable}s  
+define where program execution must suspend
+next, after the user \emph{steps over} 
+an instance of \ic{Steppable} (\eg \ic{Statement}). If a
+\ic{Steppable} contains a \ic{StepIntoable} (\eg \ic{FunctionCall}), 
+then the \ic{Steppable} also supports \emph{step into}. \ic{StepIntoable}s are
+concepts that branch execution into a \ic{SteppableComposite} (\eg \ic{Function}).
+All stepping is implemented by setting low-level breakpoints and then resuming
+execution until one of these breakpoints is hit (approach is based
+on~\cite{Wu06grammar}).
+Stepping-related concepts use \ic{DebugStrategies},
+which implement a particular stepping behavior.
 
-\noindent \textbf{Call Stack} A \ic{StackFrameContributor} is
-something that has callable semantics on the extension-level or is
-translated to a lower-level callable. While the latter category does not
-contribute any \ic{StackFrame}s to the high level call stack, the other category
-contributes one to many \ic{StackFrame}s.
+\noindent \textbf{Call Stack} \ic{StackFrameContributor}s are
+concepts that have callable semantics on the extension-level or are
+translated to low-level callables. While the latter do not
+contribute any \ic{StackFrame}s to the high level call stack, the former
+contribute at least one \ic{StackFrame}.
 
 \begin{figure}[h]
   \vspace{-2mm}
