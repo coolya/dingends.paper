@@ -1,21 +1,22 @@
-\section{Testing DSL}
+\section{Debugger Testing DSL}
 
 Our language for testing debuggers is integrated in \ic{MPS} and interacts
 with mbeddr's debugger \ic{API}. While this language is currently tightly
 coupled to mbeddr, it could in theory interact with a generic debugger \ic{API},
 however, we have not yet investigated efforts for going into this direction.
 
-\subsection{Language Design}
 
 \ac{MPS} comes already with the language \ic{mps.lang.test} for writing type
 system and editor tests.
 Its \ac{MPS} integration allows users to (1) execute tests \emph{automatically}
-from within the \ac{IDE} and (2) get the results of executed tests visualized in a
-table view. All of that functionality is build for implementors
-of \ic{ITestCase} - an interface from \ic{mps.lang.test}. By implementing it
-in \ic{DebuggerTest} (our container for
-\ic{DebuggerTestCase}s), we get the \ic{IDE} integration 
-(\hyperref[O3]{O3}).
+(on the command-line and inside the \ac{IDE}) and (2) get the results of
+executed tests visualized in a table view. All of that functionality is build for implementors
+of \ic{ITestCase} - an interface from \ic{mps.lang.test}. By implementing this
+interface in \ic{DebuggerTest} (our container for
+\ic{DebuggerTestCase}s), we get the \ic{IDE} integration and the ability to
+run our tests \emph{automatically} (\hyperref[O3]{O3}).
+
+Structure
 
 \ic{DebuggerTest} \emph{contains} \ic{IDebuggerTestContent}s, which is
 implemented by \ic{DebuggerTestCase}. This way we can instanciate
@@ -57,7 +58,92 @@ die ist erweiterbar integriert Debugger mit C + Extensions
 Beschreibt das verhalten auf der Abstraction 
 der Erweiterung von C und nicht auf C level 
 	
-\subsection{Testing Example}
+\section{Testing the Debugger Extension}
+
+1. step into TestcaseRef should suspend inside a Testcase
+\begin{lstlisting}[language=testingDSL]
+DebuggerTest UnitTesting    tests binary: ArrayInitTest
+                            uses debugger: gdb              
+   call stack inMain {
+      0:main
+         location:   onReturnInMain
+         watchables: {argc, argv}                     
+   }
+   
+   call stack inTestcase extends inMain {
+      1:forTest
+         location: <any>
+         watchables: {sum, nums}                  
+      $\gT{0}$$\gT{:}$$\gT{main}$
+   }
+   
+   testcase stepIntoTestcase {            
+      suspend at: 
+         firstArrayVarAssignment
+      then perform:                         
+         step into 1 times    
+      finally validate:                         
+         call stack stepIntoTestcase extends inTestcase {
+            1:forTest
+               overwrite location: onSumDeclaration
+               $\gT{watchables}$$\gT{:}$ $\gT{\{}$$\gT{sum, nums}$$\gT{\}}$
+            $\gT{0}$$\gT{:}$$\gT{main}$                       
+         }
+   }
+\end{lstlisting}
+
+
+2. step into/over assert should suspend on array declaration
+\begin{lstlisting}[language=testingDSL]
+abstract testcase stepOnAssert {
+   suspend at: 
+      1stAssert
+   finally validate:
+      call stack inTestcase extends inMain {
+         1:forTest
+            overwrite location:   onArrayDecl
+            overwrite watchables: {sum=0,nums}
+         0:main                      
+      }
+}
+testcase stepIntoAssert extends stepOnAssert {            
+   then perform:                         
+      step into 1 times                            
+}
+testcase stepOverAssert extends stepOnAssert {            
+   then perform:                         
+      step over 1 times                            
+}
+\end{lstlisting}
+
+
+
+\begin{lstlisting}[language=testingDSL]
+abstract testcase suspendOnArrayDecl {            
+   finally validate:                     
+      call stack inTestcase {
+      	1:forTest
+      		location: <any>
+      		watchables: <any>
+      	${\textcolor{gray}{0:main}}$
+      		$\gT{location}$$\gT{:}$ $\gT{<}$$\gT{any}$$\gT{>}$
+      		$\gT{watchables}$$\gT{:}$ $\gT{\{}$$\gT{argc, argv}$$\gT{\}}$
+      }
+}
+testcase stepIntoTestcase extends inTestcase {            
+   suspend at: 
+      firstArrayVarAssignment
+   then perform:                         
+      step into 1 times                            
+}
+\end{lstlisting}
+
+
+
+
+
+3. step over/out last assert should suspend in main function  
+
 Sample
 	Test für das Sample
 		For Each im TestCase call from test expression
