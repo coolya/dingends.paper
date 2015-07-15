@@ -1,17 +1,19 @@
 \section{Design Decisions}
 
-Our testing \ac{DSL} targets debuggers for imperative extensible languages.
+The debugger testing \ac{DSL} targets debuggers for imperative extensible
+languages.
 Those debuggers usually provide at least the following functionality:
 show the call stack and program state in relation to the languages used, 
 suspend the debugger on breakpoints and offer the possibility to 
-step through the code. Our testing language must allow us to test at least those
-four aspects. Based on those requirements we have defined some design
-decision, which we will later implement in our language. While we consider 
-some of those decisions as required, others are either optional or specific to mbeddr.
+step through the code. The language for testing those debuggers must allow us to
+verify at least those four aspects. 
+Based on those requirements we have defined
+some design decision, which we will later implement in our language. While we consider 
+some of those decisions as required (\textbf{R}), others are either optional
+(\textbf{O}) or specific to mbeddr (\textbf{M}):
 
-\subsection{Required}
 
-\noindent \textbf{\label{R1}R1 Debug state validation:} In our test cases we
+\textbf{\label{R1}R1 Debug state validation:} In our test cases we
 must be able to validate the call stack, and for each of its frames 
 the program state and the location where suspended. 
 The call stack itself is validated by specifying the expected stack
@@ -20,18 +22,17 @@ the names of watchables and their respective values, which can either be simple
 or complex. 
 Finally, a location is specified, where the debugger is expected to suspend.
 
-\noindent \textbf{\label{R2}R2 Debugger control:} In order to test stepping
+\textbf{\label{R2}R2 Debugger control:} In order to test stepping
 commands and breakpoints, we need the ability to specify stepping commands
 (in, over and out) and locations where to break.
 
-\noindent \textbf{\label{R3}R3 Source language integration:} The
+\textbf{\label{R3}R3 Source language integration:} The
 \ac{DSL} must integrate with the source language.
 This integration is required for specifying in programs under test
 locations to break (see \hyperref[R2]{R2}) and for validating where the debugger is suspended
 (see \hyperref[R1]{R1}).
 
-\subsection{Optional}
-\noindent \textbf{\label{O1}O1 Reusability:} For writing debugger tests in
+\textbf{\label{O1}O1 Reusability:} For writing debugger tests in
 an efficient way, we expect from the language the ability to reuse: (1) test
 data, (2) validation rules and (3) the structure of tests. First covers the ability to
 have one mbeddr program to debug and write different debugger tests against
@@ -44,7 +45,7 @@ write the C program and the call stack validation rule once, and refer to it
 from each of our test cases. Finally, third, since we could even think about
 writing an abstract test case, which is specialized by our concrete test cases.
 
-\noindent \textbf{\label{O2}O2 Extensibility:} As discussed in
+\textbf{\label{O2}O2 Extensibility:} As discussed in
 \hyperref[R1]{R1}, 
 we expect from the \ac{DSL} the ability to validate the program state, location
 where suspended and the call stack. In addition to this, we
@@ -56,14 +57,13 @@ debugging~\cite{MultiLevelDebugging:WSRE:breakedForInlining})
 or for writing tests more efficiently.
 
 
-\noindent \textbf{\label{O3}O3 Automated test execution:} For getting fast
+\textbf{\label{O3}O3 Automated test execution:} For getting fast
 feedback about bugs introduced into debuggers, 
 we require the ability to integrate our 
 tests into an automatic execution environment. E.g., this environment can be
 an \ac{IDE} or a command-line tool. 
 
-\subsection{mbeddr-specific}
-\noindent \textbf{\label{M1}M1 Exchangeability of debugger backends:}
+\textbf{\label{M1}M1 Exchangeability of debugger backends:}
 mbeddr targets the embedded domain and C. In this domain, target platforms and
 vendors require different compilers and debuggers. 
 Hence, we require the ability to run our tests against

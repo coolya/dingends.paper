@@ -51,13 +51,13 @@ that make up the test. Further, to have the same scope as \ic{Function}
 \ic{AssertStatemnt} requires a constraint and a type
 system rule. First restricts the usages only inside \ic{TestCase}s, meaning an
 \ic{AssertStatemnt} can only be used in a \ic{TestCase}:
-\begin{lstlisting}[language=mbeddr,frame=single]
+\begin{lstlisting}[language=constraintsAndTS,frame=single]
 parentNode.ancestor<concept = TestCase, +>.isNotNull
 \end{lstlisting}
 
 Second restricts the type of its child \ic{expr} (\emph{condition}) to
 \ic{BooleanType}, so only valid \emph{conditions} can be entered:
-\begin{lstlisting}[language=mbeddr,frame=single]
+\begin{lstlisting}[language=constraintsAndTS,frame=single]
 check(typeof(assertStatement.expr) :<=: <BooleanType()>);
 \end{lstlisting}
 
@@ -65,7 +65,7 @@ check(typeof(assertStatement.expr) :<=: <BooleanType()>);
 hence we specify \ic{Int32tType} as its type (see rule below). Later the same
 type is used in the generator.
 
-\begin{lstlisting}[language=mbeddr,frame=single]
+\begin{lstlisting}[language=constraintsAndTS,frame=single]
 check(typeof(executeTestExpression) :==: <Int32tType()>);
 \end{lstlisting}
 

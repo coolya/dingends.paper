@@ -120,6 +120,52 @@ comment=[l]{//},
 basicstyle=\scriptsize\ttfamily\color{darkgray},
 keywordstyle=\bf\scriptsize\ttfamily\color{black},
 }
+\lstdefinelanguage{constraintsAndTS}
+{keywords={typeof,check,concept,ancestor,isNotNull,parentNode
+% assert(0),assert(1),assert(2),assert(3),assert(4),
+% assert(5),assert(6),assert(7),assert(8),assert(9),assert(10),assert(11),assert(12),
+% assert(13),assert(14),assert(15),assert(16),assert(17),assert(18),assert(19),assert(20),
+% assert(21),assert(22),assert(23),assert(24),assert(25),assert(26),assert(27),assert(28),
+% assert(29),assert(30)
+},
+% otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
+otherkeywords={;,:,=,<,>,+},
+alsodigit={0,1,2,3,4,5,6,7,8,9,0},
+stringstyle=\color{black},
+mathescape=true,
+showstringspaces=false,
+sensitive=true,
+tabsize=2,
+columns=fullflexible,
+morestring=[b]",
+comment=[l]{//},
+basicstyle=\scriptsize\ttfamily\color{darkgray},
+keywordstyle=\bf\scriptsize\ttfamily\color{black},
+}
+
+\lstdefinelanguage{debuggerDSL}
+{keywords={contribute,frame,mapping,name,break,on,nodes,to,step-into,node,hide,
+with,identifier,for
+% assert(0),assert(1),assert(2),assert(3),assert(4),
+% assert(5),assert(6),assert(7),assert(8),assert(9),assert(10),assert(11),assert(12),
+% assert(13),assert(14),assert(15),assert(16),assert(17),assert(18),assert(19),assert(20),
+% assert(21),assert(22),assert(23),assert(24),assert(25),assert(26),assert(27),assert(28),
+% assert(29),assert(30)
+},
+% otherkeywords={::,:,->,=>,[,],;,==;+=,=,:<=:,:==:,<,+,&,!,\,,*},
+otherkeywords={;,:},
+alsodigit={0,1,2,3,4,5,6,7,8,9,0},
+stringstyle=\color{black},
+mathescape=true,
+showstringspaces=false,
+sensitive=true,
+tabsize=2,
+columns=fullflexible,
+morestring=[b]",
+comment=[l]{//},
+basicstyle=\scriptsize\ttfamily\color{darkgray},
+keywordstyle=\bf\scriptsize\ttfamily\color{black},
+}
 
 \newcommand{\lcolorbox}[2]{%
   \hspace*{-\fboxsep}\colorbox{#1}{#2}%
