@@ -28,7 +28,7 @@ executing tets), a \emph{C debugger backend} to use (\hyperref[M1]{M1}) and
 
 \ic{CallStackDeclaration} is another implementor of \ic{IDebuggerTestContent}
 and is used for declaring a stack of \ic{IStackFrame}s. Each frame specifies a
-\emph{name}, visible \emph{watchables} and the \emph{location} where suspended.
+\emph{name}, visible \emph{watches} and the \emph{location} where suspended.
 We currently have two implementors of this interface: \ic{StackFrameDeclaration}
 and \ic{SubStackFrame}, which extends a declaration. 
 Since a \ic{CallStackDeclaration} can extend another declaration
@@ -37,7 +37,7 @@ the extended \ic{StackFrameDeclaration}. In addition, the extending
 \ic{CallStackDeclaration} can declare additional \ic{CallStackDeclaration}s in
 the stack. 
 
-\ic{IWatchables}, \ic{WatchablesDeclaration}, \ic{AnyWatchables}
+\ic{Iwatches}, \ic{watchesDeclaration}, \ic{Anywatches}
 \ic{ISuspendLocation}, \ic{AnyLocation}, \ic{ProgramMarkerReference}
 \ic{IStackFrameName}, \ic{AnyStackFrameName}, \ic{SpecificStackFrameName}
 
@@ -60,52 +60,132 @@ der Erweiterung von C und nicht auf C level
 	
 \section{Testing the Debugger Extension}
 
-1. step into TestcaseRef should suspend inside a Testcase
+The previously described debugger testing \ac{DSL} is used in this section for
+testing the debugger extension of unit testing. While those
+tests do not aim for full test coverage, they concentrate on the essential
+scenarios to test.
+
+Before writing tests, the program using the unit testing
+language from \lst{lst:generatedUT} is annotated with markers
+(see listing below). Those markers do not influence the code generation, they
+are just used by \ic{DebuggerTestcases} to refer to code locations for
+specifying where to suspend and for verifying where
+execution suspended.
+
+\begin{lstlisting}[language=markerDSL]
+int32 main(int32 argc, string$[$ $]$ argv) {
+   [return test$[$forTest$]$;] onReturnInMain
+}
+testcase forTest {
+   [int32 sum = 0;] onSumVarDeclaration
+   [assert: sum == 0;] on1stAssertInTestcase
+   [int32$[$ $]$ nums = {1, 2, 3};] onNumsVarDeclaration
+   for(int32_t i=0;i<3;i++) { sum += nums[i]; }
+   [assert: sum == 6;] onLastStmntInTestcase
+}
+\end{lstlisting}	
+
+Next, an empty \ic{DebuggerTest} \emph{UnitTesting} is created (see listing
+below) that will later contain all \ic{DebuggerTestcase}s described in this
+section. \emph{UnitTesting} tests against the binary
+\emph{UnitTestingBinary}, which is compiled from \lst{lst:generatedUT} and further tells the
+mbeddr debugger runtime to use the \emph{gdb} debugger backend.
+
 \begin{lstlisting}[language=testingDSL]
-DebuggerTest UnitTesting    tests binary: ArrayInitTest
-                            uses debugger: gdb              
-   call stack inMain {
-      0:main
-         location:   onReturnInMain
-         watchables: {argc, argv}                     
-   }
-   
-   call stack inTestcase extends inMain {
-      1:forTest
-         location: <any>
-         watchables: {sum, nums}                  
-      $\gT{0}$$\gT{:}$$\gT{main}$
-   }
-   
-   testcase stepIntoTestcase {            
-      suspend at: 
-         firstArrayVarAssignment
-      then perform:                         
-         step into 1 times    
-      finally validate:                         
-         call stack stepIntoTestcase extends inTestcase {
-            1:forTest
-               overwrite location: onSumDeclaration
-               $\gT{watchables}$$\gT{:}$ $\gT{\{}$$\gT{sum, nums}$$\gT{\}}$
-            $\gT{0}$$\gT{:}$$\gT{main}$                       
-         }
-   }
+DebuggerTest UnitTesting    tests binary: UnitTestingBinary {
+                            uses debugger: gdb
+
+}  
 \end{lstlisting}
 
+\subsection{Step Into ExecuteTestExpression}
 
-2. step into/over assert should suspend on array declaration
+For testing \emph{step into} on instances of \ic{Execute- TestExpression},
+in the listing below a \ic{CallStack- Declaration} is created that specifies how
+the stack must be organized after performing \emph{step
+into} on \emph{onReturnInMain}. To reuse information and 
+minimize redundance in later
+\ic{DebuggerTestcase}s, two separate 
+\ic{CallStackDeclaration}s are created: First, \emph{inMain} 
+has a single \ic{StackFrame} that expects (1) execution to be suspended at  
+\emph{onReturnInMain} and (2) two watches to exist -- \emph{argc} and
+\emph{argv}. Second, \emph{inTestcase} extends
+\emph{inMain} by declaring on top of \emph{main} an addition
+\ic{StackFrame} \emph{forTest}, which specifies no location, but two
+watches: \emph{sum} and \emph{nums} (code colored
+in gray is projected from the extended \ic{CallStackDeclaration} and not
+editable).
+
+\begin{lstlisting}[language=testingDSL]
+call stack inMain {
+   0:main
+      location:   onReturnInMain
+      watches: {argc, argv}                     
+}
+   
+call stack inTestcase extends inMain {
+   1:forTest
+      location: <any>
+      watches: {sum, nums}                  
+   $\gT{0}$$\gT{:}$$\gT{main}$
+}
+\end{lstlisting}
+
+After declaring the \ic{CallStackDeclaration}s, the listing below contains
+the \ic{DebuggerTestcase} \emph{stepIntoTestcase}, which uses the declaration to
+verify \emph{step into} for instances of \ic{ExecuteTestExpression}: First,
+execution is suspended at \emph{onReturnInMain}, next, a single \emph{step into}
+command is performed before the actual call stack is validated against
+a custom \ic{CallStackDeclaration} derived from \emph{inTestcase}.
+This custom delcaration specializes for the \ic{StackFrame}
+\emph{forTest} the expected location with \emph{onSumDeclaration}.
+
+\begin{lstlisting}[language=testingDSL]
+testcase stepIntoTestcase {            
+   suspend at: 
+      onReturnInMain
+   then perform:                         
+      step into 1 times    
+   finally validate:                         
+      call stack stepIntoTestcase extends inTestcase {
+         $\gT{1}$$\gT{:}$$\gT{forTest}$
+            overwrite location: onSumDeclaration
+            $\gT{watches}$$\gT{:}$ $\gT{\{}$$\gT{sum, nums}$$\gT{\}}$
+         $\gT{0}$$\gT{:}$$\gT{main}$                       
+      }
+}
+\end{lstlisting}
+
+\subsection{Step into/over AssertStatement}
+
+After verifying \emph{step into} for \ic{ExecuteTestExpression}, 
+\emph{step into} and \emph{over} for instances of \ic{AssertStatement} is tested
+next. Since both stepping commands have the same behavior when performed at
+\emph{1stAssert}, common information can be extracted into the \emph{abstract}
+\ic{DebuggerTestcase} \emph{stepOnAssert} shown below: (1) execution is
+suspended on \emph{1stAssert} and a custom \ic{CallStackDeclaration} verifies that
+execution in \emph{forTest} is (2) suspended on \emph{onArrayDecl} and
+(3) watch \emph{num} has the value zero.
+ 
 \begin{lstlisting}[language=testingDSL]
 abstract testcase stepOnAssert {
    suspend at: 
       1stAssert
    finally validate:
-      call stack inTestcase extends inMain {
+      call stack stepOnAssert extends inTestcase {
          1:forTest
             overwrite location:   onArrayDecl
-            overwrite watchables: {sum=0,nums}
+            overwrite watches: {sum=0,nums}
          0:main                      
       }
 }
+\end{lstlisting}
+
+While the first \ic{DebuggerTestcase} \emph{stepIntoAssert} extending
+\emph{stepOnAssert} performs a \emph{step into}, the other one
+\emph{stepOverAssert} performs a \emph{step over}:
+
+\begin{lstlisting}[language=testingDSL]
 testcase stepIntoAssert extends stepOnAssert {            
    then perform:                         
       step into 1 times                            
@@ -116,40 +196,43 @@ testcase stepOverAssert extends stepOnAssert {
 }
 \end{lstlisting}
 
+\subsection{Step on last Statement in Testcase}
 
+The last testing scenario verifies stepping on the last \ic{Statement}
+(\emph{2ndAssert}) inside a \ic{Testcase} suspends execution on the calling
+\ic{ExecuteTestExpression} (\emph{onReturnInMain}).
+The approach for testing this scenario is similar as before:
+The listing below contains the \emph{abstract} \ic{DebuggerTestcase}
+\emph{steppingOnLastStmnt}, which suspends exeuction on
+\emph{2ndAssert} and verifies the actual call stack has the same structure as
+\emph{inMain}.
 
 \begin{lstlisting}[language=testingDSL]
-abstract testcase suspendOnArrayDecl {            
-   finally validate:                     
-      call stack inTestcase {
-      	1:forTest
-      		location: <any>
-      		watchables: <any>
-      	${\textcolor{gray}{0:main}}$
-      		$\gT{location}$$\gT{:}$ $\gT{<}$$\gT{any}$$\gT{>}$
-      		$\gT{watchables}$$\gT{:}$ $\gT{\{}$$\gT{argc, argv}$$\gT{\}}$
-      }
-}
-testcase stepIntoTestcase extends inTestcase {            
+abstract testcase steppingOnLastStmnt {
    suspend at: 
-      firstArrayVarAssignment
-   then perform:                         
-      step into 1 times                            
+      2ndAssert
+   finally validate:
+      call stack inMain
 }
 \end{lstlisting}
 
+Next, for \emph{step over}, \emph{into} and \emph{out} a separate
+\ic{DebuggerTestcase} is created, which extend \emph{steppingOnLastStmnt} and
+specify the additional stepping command:
 
-
-
-
-3. step over/out last assert should suspend in main function  
-
-Sample
-	Test für das Sample
-		For Each im TestCase call from test expression
-			CallStack
-			Variablen
+\begin{lstlisting}[language=testingDSL]
+testcase stepOverLastStmnt extends steppingOnLastStmnt {            
+   then perform:                         
+      step over 1 times                            
+}
+testcase stepIntoLastStmnt extends steppingOnLastStmnt {            
+   then perform:                         
+      step into 1 times                            
+}
+testcase stepOutFromLastStmnt extends steppingOnLastStmnt {            
+   then perform:                         
+      step out 1 times                            
+}
+\end{lstlisting}		
 			
-\begin{lstlisting}[language=reducedMbeddr]
-	[int32 sum = 0;] onAssignment
-\end{lstlisting}			
+	
