@@ -129,15 +129,16 @@ break on nodes to step-into: this.expr;
 
 \ic{break on nodes} searches in \ic{this.expr} (the assert's condition)
 for instances of \ic{StepIntoable} and contributes their 
-\emph{step into} strategies. Similar steps are taken to impment \emph{step into} 
-for \ic{ExecuteTestExpression}.
+\emph{step into} strategies.
 
-\ic{TestCaseRef} implements \ic{StepIntoable} to allow 
-\emph{step into} the referenced \ic{TestCase}. A  
-minimal implementation puts
-a breakpoint on the first statement in the \ic{Testcase} body:
+\ic{ExecuteTestExpression} implements \ic{StepIntoable} to allow 
+\emph{step into} the referenced \ic{TestCase}s. A  
+minimal implementation puts for each \ic{Testcase} abreakpoint on the first
+statement in the body:
 \begin{lstlisting}[language=debuggerDSL,frame=single]
-break on node: this.testcase.body.statements.first;
+foreach testRef in this.tests { 
+   break on node: testRef.testcase.body.statements.first;
+}
 \end{lstlisting}
 
 \subsection{Watches} 
