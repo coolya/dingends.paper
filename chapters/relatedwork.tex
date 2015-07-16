@@ -1,38 +1,34 @@
 \section{Related Work}
 
-Wu et al. describe a unit testing framework for
-\acp{DSL}~\cite{DBLP:conf/dsl/WuGM09}. 
-While they concentrate on testing the semantics of the language, we believe testing
-\acp{DSL} should not only cover the semantics, but also other language
-aspects: editor (concrete syntax), type system, scoping, transformation rules,
-and finally the debugger.\footnote{Specific language workbenches might require
-testing of additional aspects} All of those aspects
-form part of the language implementation and should therefore be tested as well.
-While mbeddr comes with tests for the editor, editor, type system, scoping and
-transformation rules, we contribute in this paper a language for testing the
-debugger aspect, which is used in mbeddr for testing the debugger.
+Wu et al. describe a unit testing framework for 
+\acp{DSL}~\cite{DBLP:conf/dsl/WuGM09} with focus on
+testing the semantics of the language.  However, it is necessary that testing
+\acp{DSL} cover all related aspects of the language \eg editor
+(concrete syntax), type system, scoping, transformation rules, and finally the
+debugger.\footnote{Specific language workbenches might require
+testing of additional aspects}
+mbeddr contains tests for the editor, type system, scoping and transformation
+rules, our work contributes the language for testing the debugger aspect.
 
-The \ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
-Tests for this debugger are written in Python and with the 
-unit-test framework that comes with Python.
-While those tests verify the debugger's command
-line interface and the scripting API, they also test other functionality, such
-as using the help menu or changing the debugger settings.
-Further, some of the \ac{LLDB} tests  
-verify the debugging behavior on different platforms, such as Darwin, Linux or
-FreeBSD. In contrast, we only concentrate on testing the debugging behavior,
-however, we also support writing tests against specific platforms. 
-The approach for testing the debugging behavior is derived from the \ac{LLDB}
-project:
-write a program in the source-language (mbeddr), compile it to an executable and
-debug it through test cases, which verify the debugging behavior.
+\ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
+Test cases for this debugger are written in Python
+and the unittest framework of Python. While those tests verify the debugger’s
+command line interface and the scripting API, they also test other
+functionality, such as using the help menu or changing the debugger settings.
+Further, some of the \ac{LLDB} tests verify the debugging behavior on different
+platforms, such as Darwin, Linux or FreeBSD. In contrast, we only concentrate on
+testing the debugging behavior and we also support writing tests against
+specific platforms. However, the approach for testing the debugging behavior is
+derived from the \ac{LLDB} project: write a program in the source-language (mbeddr),
+compile it to an executable and debug it through test cases, which verify the
+debugging behavior.
 
-The \ac{GDB} provided by the GNU project takes a similar
-approach as the \ac{LLDB}: debugger tests are cover different aspects of the
-debugger's functionality and are written in a scripting language~\cite{gdb}.
-While we concentrate on testing the debugging behavior for one extensible
-language, the \ac{GDB} project tests debugging behavior for all of its supported
-languages, such as C, C++, Java, Ada etc. Further, those tests run on different
-platforms and different target configurations. In contrast, we only also support
-writing tests against different platforms, but do not allow users to change the
-target configuration via the \ac{DSL}.
+The \ac{GDB} provided by the GNU project takes a similar approach as
+the \ac{LLDB}: debugger tests cover different aspects of the debugger’s
+functionality and are written in a scripting language~\cite{gdb}.
+Contrarily, to our approach of testing the debugging behavior 
+for one extensible language, \ac{GDB} project tests
+debugging behavior for all of its supported languages, such as C, C++, Java, Ada
+etc. Further, those tests run on different platforms and different target
+configurations. Our work supports writing tests against different platforms, but
+does not allow users to change the target configuration via the \ac{DSL}.
