@@ -15,9 +15,8 @@ the program state and the location where execution is suspended.
 The call stack itself is validated by specifying the expected stack
 frames with their respective names. In terms of program state, we need to verify
 the names of watches and their respective values, which can either be simple
-or complex. 
-Finally, a location is specified, where program execution is expected to
-suspend.
+or complex. Further, a location specifies where program execution is
+expected to suspend and tests can be written for a specific platform. 
 
 \textbf{\label{R2}R2 Debug control:} In order to test stepping
 and breakpoints, we require the ability to execute stepping commands

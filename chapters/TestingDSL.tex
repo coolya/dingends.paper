@@ -7,29 +7,30 @@ and be implemented with a language workbench other than \ac{MPS}.
 This section describes the structure of \emph{DeTeL} and the
 implementation of design decisions discussed in \sect{DesignDecisions}.
 
-\ic{DebuggerTest} is the module in which \ic{DebuggerTestcase}s and
-\ic{CallStack}s are declared. 
-
-
 \subsection{DebuggerTest}
 
-\fig{fig:DebuggerTestStructure} shows the structure of \ic{DebuggerTest}: 
-it \emph{contains} \ic{ITestContent}s, currently implemented by 
-\ic{DebuggerTestcase} and \ic{CallStack} (described later). By
-implementing this interface we can also use other concepts inside
+\fig{fig:DebuggerTestStructure}) shows the structure of 
+\ic{DebuggerTest}, which is a module that \emph{contains} 
+\ic{ITestContent}s, currently implemented by 
+\ic{DebuggerTestcase} and \ic{CallStack} (described later). This interface
+facilitates extensibility inside
 \ic{DebuggerTest} (\hyperref[O2]{O2}). Further, \ic{DebuggerTest} refers to 
-a \ic{Binary} (the compiled mbeddr program under test), \emph{imports} of other
-\ic{DebuggerTest}s (enables reuse \hyperref[O1]{O1}) and an
+a \ic{Binary} (concept from mbeddr representing the compiled mbeddr program
+under test, \hyperref[R3]{R3}), \emph{imports} of \ic{ITestContent}s from other 
+\ic{DebuggerTest}s (\hyperref[O1]{O1}) and an
 \ic{IDebuggerBackend} that specifies the debugger backend to use
-(\hyperref[M1]{M1}). Latter is implemented by \ic{GdbBackend} and allows this
-way to execute debugger tests with the \ac{GDB}~\cite{gdb}.
+(\hyperref[O2]{O2}, \hyperref[M1]{M1}). Latter is implemented by
+\ic{GdbBackend} and allows this way to run debugger tests with the
+\ac{GDB}~\cite{gdb}.
 
 \begin{figure}[h]
   \vspace{-2mm}
   \centering
-    \includegraphics[width=8.5cm]{./figures/umldiag.png} 
+    \includegraphics[width=8.5cm]{./figures/graph2-1.png} 
     \vspace{-2mm}
-    \caption{Structure of \ic{DebuggerTest}s}
+    \caption{\ic{DebuggerTest} structure: \emph{DeTeL} concepts 
+    (white boxes), \ic{ITest- case} (light gray box) is from
+    \ac{MPS} and \ic{Binary} (dark grey box) from mbeddr.}
   \label{fig:DebuggerTestStructure}
   \vspace{-2mm}
 \end{figure}
@@ -49,16 +50,15 @@ run our tests \emph{automatically} (\hyperref[O3]{O3}).
 \subsection{CallStack}
 
 \ic{CallStack} implements \ic{ITestContent} 
-(see \fig{fig:CallStackStructure}) and is used for declaring a
-stack of \ic{IStackFrame}s. Each frame specifies a \emph{name}, 
-visible \emph{watches} and the \emph{location} where suspended.
+(see \fig{fig:CallStackStructure}) and contains
+\ic{IStackFrame}s (\hyperref[O2]{O2}, \hyperref[R1]{R1}). Each frame
+specifies a \emph{name}, visible \emph{watches} and the \emph{location} where suspended.
 We have two implementations of \ic{IStackFrame}:
-\ic{StackFrame} and \ic{StackFrameExtension} 
-(extends a \ic{StackFrame}).
-Since a \ic{CallStack} can extend another
-\ic{CallStack}, \ic{StackFrameExtension} can be used 
-to specialize properties of the extended \ic{StackFrame}. Additionally, the
-extending \ic{CallStack} can declare further \ic{StackFrame}s.
+\ic{StackFrame} and \ic{StackFrameExtension}.
+While an \emph{extend}ing \ic{CallStack} can declare additional
+\ic{StackFrame}s, it contains for each inherited
+\ic{StackFrame} a \ic{StackFrameExtension} that allows specialization of
+inherited properties (\hyperref[O1]{O1}).
 
 \begin{figure}[h]
   \vspace{-2mm}
@@ -71,29 +71,28 @@ extending \ic{CallStack} can declare further \ic{StackFrame}s.
 \end{figure}
 
 \ic{IStackFrame} has three parts: a \emph{name} 
-(\ic{IStackFrameName}), a location where suspended (\ic{ISuspendLocation}) 
-and a list of visible (\ic{IWatches}).
+(\ic{IStackFrameName}), a location where execution should suspend
+(\ic{ISuspend- Location}) and visible watches (\ic{IWatches}).
 
-\ic{IStackFrameName} has two implementations: \ic{Any- StackFrameName} does not
-validate the name, while \ic{StackFrameName} verifies a specific
-\emph{name}. Next, \ic{ISuspendLocation} with its implementations:
-the location where suspended is not validated with \ic{Any- Location},
-while \ic{ProgramMarkerRef} references a \ic{ProgramMarker} that represents a
-specific location in an mbeddr program. Instances of \ic{ProgramMarker} do not influence
-code generation, they just annotate nodes in the \ac{AST}. \ic{IWatches} is
-implemented by \ic{Anywatches} and \ic{WatchesDeclaration}. First does not
-validate visible watches, while the declaration specifies the \emph{name} of
-watch and its value with a \ic{ValueExpression}. This expression again has two
-implementors: \ic{PrimitiveValueExpression} for primitive values (\eg numbers or
-characters) and \ic{ComplexValueExpression} for complex values (\eg arrays or
-structs).
+\ic{IName} has two implementations: while \ic{SpecificName} verifies
+a specific \emph{name}, \ic{AnyName} ignores the \emph{name}.
+Next, \ic{ILocation} with its implementations:
+\ic{AnyLocation} again does no validations, 
+while \ic{ProgramMarkerRef} references a \ic{ProgramMarker}  that represents a
+specific location in a program under test (\hyperref[R3]{R3}). Those markers do
+not influence code generation, they just annotate nodes in the \ac{AST}.
+\ic{IWatches} has two implementations: \ic{AnyWatches} and \ic{WatchList}.
+First performs no validations, while the other one holds a list of \ic{Watch}es 
+that specify a \emph{name} and a \emph{value} expressed with 
+\ic{IValue}. For verifying values, \ic{PrimitiveValue}  (\eg numbers)
+or \ic{ComplexValue} (\eg arrays) is used.
 
 \subsection{DebuggerTestcase}
 
-The structure of \ic{DebuggerTestcase} is shown in
-\fig{fig:DebuggerTestcaseStructure}:
-has a \emph{name}, can \emph{extend} other \ic{DebuggerTestcase}s and can be
-\ic{abstract}. Further it holds the following parts:
+\fig{fig:DebuggerTestcaseStructure} shows the structure of
+\ic{DebuggerTestcase}:
+can \emph{extend} other \ic{DebuggerTestcase}s (\hyperref[O1]{O1}), specifies a
+\emph{name}, and can be \ic{abstract}. Further it holds the following parts:
 \ic{SuspendConfig}, \ic{SteppingConfig} and
 \ic{Validation- Config}. Concrete \ic{DebuggerTestcase}s require at least  
 a \ic{SuspendConfig} and a \ic{ValidationConfig} (can be inherited),
@@ -110,24 +109,25 @@ while an \ic{abstract} \ic{DebuggerTestcase} requires none.
 \end{figure}
 
 \ic{SuspendConfig} contains a \ic{ProgramMarkerRef} that points to
-\emph{location} inside the mbeddr program under tests. When executing the test,
-the debugger is suspended at this \emph{location}. 
+\emph{location} inside the mbeddr program under tests (\hyperref[R2]{R2}). 
+After starting the test, execution first suspends at this \emph{location}. 
 
 \ic{SteppingConfig} is optional and contains a
-list of \ic{ISteppingElement}s that are executed after suspending on
-\emph{location}. This interface is implemented by 
-\ic{ISteppingCommand} and \ic{SuperConfigElement}. Former is again an
-interface and holds a property \emph{times} that specifies how often the command
-is executed. Its implementations are \ic{StepIntoCommand},
-\ic{StepOverCommand}, \ic{StepOutCommand} -- the minimal stepping commands.
+list of \ic{IStep- pingCommand}s (\hyperref[O2]{O2})that are executed after
+suspending on \emph{location} (\hyperref[R2]{R2}). This interface is implemented by 
+\ic{StepInto}, \ic{StepOver}, \ic{StepOut} (each performs the command
+\emph{n times}). Additionally, \ic{Super} implements the interface, so
+the inherited \ic{SteppingConfig} can be extended.
 
-\ic{ValidationConfig} contains a list of \ic{IValidationElements}. This
-interface is implemented by the previously described \ic{CallStack}
-and \ic{CallStackRef}, which is used for refering to a
-\ic{CallStack} without having the possibility to extend it.
-Finally, \ic{OnPlatform} executes contained \ic{ValidationConfig}s only if tests
-are executed on the specified \ic{Platform} (possible platforms are Mac, Unix or
-Windows).
+\ic{ValidationConfig} contains a list of \ic{IValidation}s
+(\hyperref[O2]{O2}, \hyperref[R1]{R1}), implemented by the previously described
+\ic{CallStack}, \ic{CallStackRef}, \ic{OnPlatform} and \ic{Super}. 
+While \ic{Super} represents inherited \ic{IValidation}s,
+\ic{CallStackRef} refers to a \ic{CallStack} without having the
+possibility to modify it.
+Finally, \ic{OnPlatform} specifies a \ic{Platform} (\emph{Mac}, \emph{Unix} or
+\emph{Windows}) and executes contained \ic{Validation}s only if tests are
+executed on that specific \ic{Platform} (\hyperref[R1]{R1}).
 
 \section{Testing the Debugger Extension}
 
@@ -138,9 +138,9 @@ scenarios to test.
 
 Before writing tests, the program using the unit testing
 language from \lst{lst:generatedUT} is annotated with markers
-(see listing below). Those markers do not influence the code generation, they
-are just used by \ic{DebuggerTestcases} to refer to code locations for
-specifying where to suspend and for verifying where
+(see listing below). Those markers do not influence the code generation,
+however, they are used by \ic{DebuggerTestcase}s to refer to code locations
+for specifying where to suspend execution and for verifying where
 execution suspended.
 
 \begin{lstlisting}[language=markerDSL]
@@ -156,11 +156,11 @@ testcase forTest {
 }
 \end{lstlisting}	
 
-Next, an empty \ic{DebuggerTest} \emph{UnitTesting} is created (see listing
-below) that will later contain all \ic{DebuggerTestcase}s described in this
-section. \emph{UnitTesting} tests against the binary
-\emph{UnitTestingBinary}, which is compiled from \lst{lst:generatedUT} and further tells the
-mbeddr debugger runtime to use the \emph{gdb} debugger backend.
+Next, in the listing below an empty \ic{DebuggerTest} \emph{UnitTesting} is
+created that will later contain all \ic{Debugger- Testcase}s described in this
+section. \emph{UnitTesting} tests against the binary \emph{UnitTestingBinary},
+which is compiled from \lst{lst:generatedUT} and further tells the mbeddr
+debugger runtime to execute tests with the \ic{gdb} debugger backend.
 
 \begin{lstlisting}[language=testingDSL]
 DebuggerTest UnitTesting    tests binary: UnitTestingBinary {
@@ -172,25 +172,25 @@ DebuggerTest UnitTesting    tests binary: UnitTestingBinary {
 \subsection{Step Into ExecuteTestExpression}
 
 For testing \emph{step into} on instances of \ic{Execute- TestExpression},
-in the listing below a \ic{CallStack- Declaration} is created that specifies how
+in the listing below a \ic{CallStackDec- laration} is created that specifies how
 the stack must be organized after performing \emph{step
 into} on \emph{onReturnInMain}. To reuse information and 
 minimize redundance in later
 \ic{DebuggerTestcase}s, two separate 
 \ic{CallStack}s are created: First, \emph{inMain} 
-has a single \ic{StackFrame} that expects (1) execution to be suspended at  
-\emph{onReturnInMain} and (2) two watches to exist -- \emph{argc} and
-\emph{argv}. Second, \emph{inTestcase} extends
+has a single \ic{StackFrame} that expects (1) execution to suspend at  
+\emph{onReturnInMain} and (2) two watches to exist (\emph{argc} and
+\emph{argv}). Second, \emph{inTestcase} extends
 \emph{inMain} by declaring on top of \emph{main} an addition
 \ic{StackFrame} \emph{forTest}, which specifies no location, but two
-watches: \emph{sum} and \emph{nums} (code colored
-in gray is projected from the extended \ic{CallStack} and not
-editable).
+watches (\emph{sum} and \emph{nums}). In \emph{inTestcase}, inherited
+\ic{StackFrame}s are colored in gray and not editable, since they are
+just a projection of the original.
 
 \begin{lstlisting}[language=testingDSL]
 call stack inMain {
    0:main
-      location:   onReturnInMain
+      location: onReturnInMain
       watches: {argc, argv}                     
 }
    
@@ -202,14 +202,15 @@ call stack inTestcase extends inMain {
 }
 \end{lstlisting}
 
-After declaring the \ic{CallStack}s, the listing below contains
-the \ic{DebuggerTestcase} \emph{stepIntoTestcase}, which uses the declaration to
-verify \emph{step into} for instances of \ic{ExecuteTestExpression}: First,
+After declaring both \ic{CallStack}s, the listing below contains
+the \ic{DebuggerTestcase} \emph{stepIntoTestcase}, which uses \emph{inTestcase}
+to verify \emph{step into} for instances of \ic{ExecuteTestExpression}: First,
 execution is suspended at \emph{onReturnInMain}, next, a single \emph{step into}
-command is performed before the actual call stack is validated against
+is performed before the actual call stack is validated against
 a custom \ic{CallStack} derived from \emph{inTestcase}.
-This custom delcaration specializes for the \ic{StackFrame}
-\emph{forTest} the expected location with \emph{onSumDeclaration}.
+This custom declaration specializes in
+\emph{forTest} the expected location to suspend execution with
+\emph{onSumDeclaration}.
 
 \begin{lstlisting}[language=testingDSL]
 testcase stepIntoTestcase {            
@@ -231,10 +232,10 @@ testcase stepIntoTestcase {
 
 After verifying \emph{step into} for \ic{ExecuteTestExpression}, 
 \emph{step into} and \emph{over} for instances of \ic{AssertStatement} is tested
-next. Since both stepping commands have the same behavior when performed at
-\emph{1stAssert}, common information can be extracted into the \emph{abstract}
-\ic{DebuggerTestcase} \emph{stepOnAssert} shown below: (1) execution is
-suspended on \emph{1stAssert} and a custom \ic{CallStack} verifies that
+next. Both step commands have the same outcome when performed at
+\emph{1stAssert}, hence common test behavior is extracted into the
+\emph{abstract} \ic{DebuggerTestcase} \emph{stepOnAssert} shown below: (1) 
+execution suspends on \emph{1stAssert} and a custom \ic{CallStack} verifies 
 execution in \emph{forTest} is (2) suspended on \emph{onArrayDecl} and
 (3) watch \emph{num} has the value zero.
  
@@ -269,12 +270,12 @@ testcase stepOverAssert extends stepOnAssert {
 
 \subsection{Step on last Statement in Testcase}
 
-The last testing scenario verifies stepping on the last \ic{Statement}
-(\emph{2ndAssert}) inside a \ic{Testcase} suspends execution on the calling
+The last testing scenario verifies that stepping on the last \ic{Statement}
+(\emph{2ndAssert}) inside a \ic{Testcase} suspends execution on the caller
 \ic{ExecuteTestExpression} (\emph{onReturnInMain}).
-The approach for testing this scenario is similar as before:
-The listing below contains the \emph{abstract} \ic{DebuggerTestcase}
-\emph{steppingOnLastStmnt}, which suspends exeuction on
+The approach for testing this scenario is similar as before (see listing
+below): an \emph{abstract} \ic{DebuggerTestcase}
+\emph{steppingOnLastStmnt} suspends execution on
 \emph{2ndAssert} and verifies the actual call stack has the same structure as
 \emph{inMain}.
 
@@ -287,9 +288,9 @@ abstract testcase steppingOnLastStmnt {
 }
 \end{lstlisting}
 
-Next, for \emph{step over}, \emph{into} and \emph{out} a separate
-\ic{DebuggerTestcase} is created, which extend \emph{steppingOnLastStmnt} and
-specify the additional stepping command:
+Next, for \emph{step over}, \emph{into} and \emph{out} separate
+\ic{DebuggerTest- case}s are created, which extend \emph{steppingOnLastStmnt}
+and specify the respective stepping command:
 
 \begin{lstlisting}[language=testingDSL]
 testcase stepOverLastStmnt extends steppingOnLastStmnt {            

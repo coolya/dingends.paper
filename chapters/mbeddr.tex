@@ -44,9 +44,9 @@ that make up the test. Further, to have the same scope as \ic{Function}
 
 \subsection{Type System and Constraints}
 
-\ic{AssertStatemnt} requires a constraint and a type
+\ic{AssertStatement} requires a constraint and a type
 system rule. First restricts the usages only inside \ic{Testcase}s, meaning an
-\ic{AssertStatemnt} can only be used in a \ic{Testcase}:
+\ic{AssertStatement} can only be used in a \ic{Testcase}:
 \begin{lstlisting}[language=constraintsAndTS,frame=single]
 parentNode.ancestor<concept = Testcase, +>.isNotNull
 \end{lstlisting}
