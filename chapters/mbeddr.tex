@@ -4,24 +4,20 @@ mbeddr~\cite{Voelter:2012:MEC:2384716.2384767} is an extensible version of C
 that can be extended with modular, domain-specific extensions. 
 It is built on top of JetBrains \ac{MPS}~\cite{2012_mps_homepage}
 and ships with a set of language extensions dedicated to embedded software
-development. \ac{MPS} supports the definition, composition and use of general
-purpose or domain-specific languages.
-
-mbeddr includes an extensible C99 implementation. Further, 
+development. mbeddr includes an extensible C99 implementation. Further, 
 it also includes a set of predefined language extensions on top of C. These 
 extensions include state machines, components and physical units.
 
-In \ac{MPS}, language implementations are separated into modular aspects. 
-The major aspects  of a language are \ic{Structure}, 
-\ic{Type System}, \ic{Contraints}, \ic{Generator} and \ic{Editor}. However, for
-building debugging support for a language, \ic{Editor} aspect is irrelevant.
+In \ac{MPS}, language implementations are separated into aspects. 
+The major aspects  are \ic{Structure}, 
+\ic{Type System}, \ic{Constraints}, \ic{Generator} and \ic{Editor}. However, for
+building debugging support, the \ic{Editor} aspect is irrelevant.
 
 \section{Language Extension for Unit Testing}
 
 To give an idea of building language and debugger extensions, we first 
-build a language extension for writing 
-unit tests, which is derivded from mbeddr's \ic{unittest}
-language, and the corresponding debugger extension. Later,
+build an extension for writing 
+unit tests, and the corresponding debugger extension. Later,
 we will describe how to test this debugger extension with a \ac{DSL}. 
 
 \subsection{Structure}
@@ -30,29 +26,29 @@ we will describe how to test this debugger extension with a \ac{DSL}.
 \ic{AssertStatement} is derived from \ic{Statement} and can therefore
 be used where \ic{Statement}s are expected. It contains an \ic{Expression}
 for the \emph{condition}.
-\ic{TestCase} holds a \ic{StatementList} that contains the \ic{Statement}s
+\ic{Testcase} holds a \ic{StatementList} that contains the \ic{Statement}s
 that make up the test. Further, to have the same scope as \ic{Function}
-\ic{TestCase} implements \ic{IModuleContent}.
+\ic{Testcase} implements \ic{IModuleContent}.
 \ic{ExecuteTestExpression} contains a list of
-\ic{TestCaseRef}, which refer to \ic{TestCase}s to be executed.
+\ic{TestcaseRef}, which refer to \ic{Testcase}s to be executed.
 
 \begin{figure}[h]
-  \vspace{-2mm}
+  \vspace{-3mm}
   \centering
-    \includegraphics[width=8.5cm]{./figures/umldiag.png} 
-    \vspace{-2mm}
+    \includegraphics[width=8.5cm]{./figures/unitTestingLangUML2.png} 
+    \vspace{-3mm} 
     \caption{Language structure}
   \label{fig:UnitTestStructure}
-  \vspace{-2mm}
+  \vspace{-5mm}
 \end{figure}
 
 \subsection{Type System and Constraints}
 
 \ic{AssertStatemnt} requires a constraint and a type
-system rule. First restricts the usages only inside \ic{TestCase}s, meaning an
-\ic{AssertStatemnt} can only be used in a \ic{TestCase}:
+system rule. First restricts the usages only inside \ic{Testcase}s, meaning an
+\ic{AssertStatemnt} can only be used in a \ic{Testcase}:
 \begin{lstlisting}[language=constraintsAndTS,frame=single]
-parentNode.ancestor<concept = TestCase, +>.isNotNull
+parentNode.ancestor<concept = Testcase, +>.isNotNull
 \end{lstlisting}
 
 Second restricts the type of its child \ic{expr} (\emph{condition}) to
@@ -72,13 +68,14 @@ check(typeof(executeTestExpression) :==: <Int32tType()>);
 
 \subsection{Generator}
 
-The unit test generator consists of many different transformation rules, which translate  
-code written with the language directly to mbeddr C. \lst{lst:generatedUT} shows
+The unit testing generator consists of many different transformation rules,
+which translate code written with the language directly to mbeddr C. \lst{lst:generatedUT} shows
 on the left hand side an example program, written with mbeddr C and the unit
-test language. The right hand side shows the C program generated from it. While
-regular mbeddr code is not colored, the boxes show how \ac{AST} nodes from the
+testing language. The right hand side shows the C program generated from it.
+While regular mbeddr code is not colored, the boxes show how \ac{AST} nodes from the
 left are translated to C code on the right.
 
+\vspace{-2mm}
 \noindent 
 \hspace{1.2mm}
 \begin{minipage}[t]{120pt} 
@@ -107,7 +104,7 @@ $\colorbox{white}{{\color{white}\_f++;}}$
 $\colorbox{g7}{\}}$
 \end{lstlisting}
 \end{minipage} 
-\rule[-53ex]{0.1ex}{24.0em}
+\rule[-52ex]{0.1ex}{23.0em}
 \hspace{0.75mm}
 \begin{minipage}[t]{125pt} 
 \begin{lstlisting}[language=reducedMbeddr,numbers=left]
@@ -135,10 +132,9 @@ $\colorbox{g7}{\hspace{2.8mm}return \_f;}$
 $\colorbox{g7}{\}}$
 \end{lstlisting}
 \end{minipage} 
-\vspace{-1mm}
+\vspace{-3mm}
 \begin{lstlisting}[caption={Example mbeddr program using the unit test language
-on the left and the C code that has been generated from it on the right. Empty
-lines on the left have no meaning, they are used for showing the relationship
-between high-level and generated code.},language=mbeddr,label=lst:generatedUT]
+on the left and the C code that has been generated from it on the right.},
+language=mbeddr,label=lst:generatedUT]
 \end{lstlisting}
 

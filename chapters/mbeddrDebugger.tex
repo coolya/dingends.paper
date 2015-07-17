@@ -6,13 +6,13 @@ mbeddr comes with a debugger, which allows users to debug their mbeddr code
 on the abstraction levels of the used languages. For that, each language
 contributes a debugger extension, which is build with a framework also provided
 by mbeddr~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}.
-Debugging support is implemented specificly for the language by
+Debugging support is implemented specifically for the language by
 lifting the call stack/program state from the base-level to the
 extension-level (see \fig{infoFlow}) and stepping/breakpoints
 vice versa.
 
 \begin{figure}[h]
-  \vspace{-2mm}
+  \vspace{-3mm}
   \centering
     \includegraphics[width=5.5cm]{./figures/two-levels.png} 
     \vspace{-2mm}
@@ -33,7 +33,7 @@ thus achieving the mapping described in~\fig{infoFlow}.
 In this paper, we focus only on the specification part (see
 \fig{specabs}) required for understanding how the debugger extension
 for unit testing is build.
-Further details about the architecture and its implemention with \ac{MPS} are
+Further details about the architecture and its implementation with \ac{MPS} are
 described in \cite{DBLP:conf/adaEurope/AdaEuropeDeb}. 
 
 
@@ -45,7 +45,7 @@ we can set breakpoints to suspend the program execution.
 \subsection{Watches}
 
 \ic{WatchProvider}s are translated to low-level watches (\eg
-\ic{GlobalVariableDeclaration}) or represent watches on the extension-level.
+\ic{Argument}) or represent watches on the extension-level.
 They are declared inside \ic{WatchProviderScope}s (\eg
 \ic{StatementList}), which is a nestable context.
 
@@ -65,16 +65,16 @@ stepping-related concepts by utilizing \ic{DebugStrategies}.
 \subsection{Call Stack}
 \ic{StackFrameContributor}s are
 concepts that have callable semantics on the extension-level or are
-translated to low-level callables (functions or procedures). While the latter do
+translated to low-level callables (\eg \ic{Function}s). While the latter do
 not contribute any \ic{StackFrame}s to the high level call stack, the former
 contribute at least one \ic{StackFrame}.
 
 \begin{figure}[h]
   \vspace{-2mm}
   \centering
-    \includegraphics[width=9cm]{./figures/debugger-concepts.png} 
-    \vspace{-2mm}
-    \caption{Meta-model used for specying the debugging semantics of language
+    \includegraphics[width=8.75cm]{./figures/debugger-concepts.png} 
+    \vspace{-4mm}
+    \caption{Meta-model used for specifying the debugging semantics of language
     concepts~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}. Colors indicate the
     different debugging aspects.} 
   \label{specabs}
@@ -83,39 +83,39 @@ contribute at least one \ic{StackFrame}.
 
 \section{Debugger Extension for Unit Testing}
 
-This section describes the implementation of a minimal debugger
+This section describes the implementation of a debugger
 for the unit testing language, which is defined with mbeddr's debugger
-specification \ac{DSL} and the abstractions shown in \fig{specabs}.
+specification \ac{DSL} and abstractions shown in \fig{specabs}.
 
 \subsection{Breakpoints}  To enable
-breakpoints on instances of \ic{AssertStatement}, 
-an implementation of the \ic{Breakable} interface is required. Since
-\ic{AssertStatement} is derived from \ic{Statement} that already implements this
-interface, thus breakpoints can be set on \ic{AssertStatement}.
+breakpoints on \ic{AssertStatement}s, 
+an implementation of the \ic{Breakable} interface is required.
+\ic{Assert- Statement} is derived from \ic{Statement} that already implements
+this interface, thus breakpoints are supported already.
 
 \subsection{Call Stack}
 
-\ic{TestCase} and \ic{ExecuteTestExpression} implement
-\ic{StackFrameContributor} that are concepts translated to 
-base-level callables. They contribute StackFrames, 
+\ic{Testcase} and \ic{ExecuteTestExpression} are translated to 
+base-level callables and therefore implement
+\ic{StackFrame- Contributor}. They contribute \ic{StackFrame}s, 
 each is linked to a base-level stack frame and
 states whether it is visible in the extension-level call stack or not.
 
 The implementation of  \ic{ExecuteTestExpression} links the
 low-level stack frame to the respective instance (see listing below).
-Additionally, it declares to hide the stack frame 
+Additionally, it hides the stack frame 
 from the high-level call stack.
 
 \begin{lstlisting}[language=debuggerDSL,frame=single]
 contribute frame mapping for frames.select(name=getName());
 \end{lstlisting}
 
-Similarly the mapping for \ic{TestCase} also requires linking the
+Similarly the mapping for \ic{Testcase} also requires linking the
 low-level stack frame to the respective instance. However, 
 it declares to \emph{show} the stack frame in the high-level call stack.
-Further, we provide the name of the actual \ic{TestCase}, which is represented
+Further, we provide the name of the actual \ic{Testcase}, which is represented
 in the call stack view: Consider \lst{lst:generatedUT}, where we would
-lift the name \ic{test\_forTest} to \ic{forTest}.
+show the name \ic{forTest} instead of \ic{test\_forTest}.
 
 \subsection{Stepping} 
 
@@ -127,17 +127,16 @@ already provides \emph{step over} behavior. However, to be able to
 break on nodes to step-into: this.expr;
 \end{lstlisting}
 
-\ic{break on nodes} searches in \ic{this.expr} (the assert's condition)
+\ic{break on nodes} searches in \emph{condition}
 for instances of \ic{StepIntoable} and contributes their 
 \emph{step into} strategies.
 
 \ic{ExecuteTestExpression} implements \ic{StepIntoable} to allow 
-\emph{step into} the referenced \ic{TestCase}s. A  
-minimal implementation puts for each \ic{Testcase} abreakpoint on the first
-statement in the body:
+\emph{step into} the referenced \ic{Testcase}s. A  
+minimal implementation puts a breakpoint in each \ic{Testcase}:
 \begin{lstlisting}[language=debuggerDSL,frame=single]
 foreach testRef in this.tests { 
-   break on node: testRef.testcase.body.statements.first;
+   break on node: testRef.test.body.statements.first;
 }
 \end{lstlisting}
 
@@ -145,10 +144,10 @@ foreach testRef in this.tests {
 
 Since \ic{ExecuteTestExpression}'s  stack frame is not shown in the high-level
 call stack, none of its watches are mapped.
-In contrast,  stack frames for \ic{TestCase}s are visible thus we need
-to consider its watches. In case of \ic{TestCase}, the 
-\ic{LocalVariableDeclaration} \_f has no corresponding representation on
-the extension-level, therefore we hide it from the watches view (the C watch
+In contrast,  stack frames for \ic{Testcase}s are visible thus we need
+to consider its watches. In case of \ic{Testcase}, the 
+\ic{LocalVariableDeclaration} \_f has no corresponding
+representation on the extension-level, therefore we hide it from the watches view (the C watch
 would be shown otherwise):
 
 \begin{lstlisting}[frame=single,language=debuggerDSL]

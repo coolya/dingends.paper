@@ -24,7 +24,7 @@ and breakpoints, we require the ability to execute stepping commands
 (in, over and out) and specify locations where to break.
 
 \textbf{\label{R3}R3 Language integration:} The
-\ac{DSL} must integrate with the language extension.
+\ac{DSL} must integrate with language extensions.
 This integration is required for specifying in programs under test
 locations where to break (see \hyperref[R2]{R2}) and for validating where
 program execution is suspended (see \hyperref[R1]{R1}).
@@ -35,11 +35,11 @@ test data, (2) validation rules and (3) the structure of tests. First covers
 the ability to have one mbeddr program as test data for multiple test cases.
 Second refers to single definition and multiple usage of validation rules among
 different test cases. Finally, third refers to extending test cases and
-having the possibilty to specialize them.
+having the possibility to specialize them.
 
 \textbf{\label{O2}O2 Extensibility:} 
 
-This means the language should provide support for contributing new
+Languages should provide support for contributing new
 validation rules thus achieving extensibility. Those new rules can be used for
 testing further debugger functionality not covered by \emph{DeTeL} (\eg mbeddr's
 upcoming support for multi-level debugging~\cite{MultiLevelDebugging:WSRE:breakedForInlining}) 
@@ -49,7 +49,8 @@ or for writing tests more efficiently.
 \textbf{\label{O3}O3 Automated test execution:} For fast
 feedback about newly introduced debugger bugs, 
 we require the ability to integrate our 
-tests into an automatic execution environment (\eg a build server). 
+tests into an automatic execution environment (\eg an \ic{IDE} or a build
+server).
 
 \textbf{\label{M1}M1 Exchangeable debugger backends:}
 

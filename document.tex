@@ -258,8 +258,8 @@ keywordstyle=\bf\scriptsize\ttfamily\color{black},
 %\title{Using the Style File IEEEtran.sty} 
 %\title{Testing Debuggers for Extensible Languages} %!PN
 %\title{A DSL for Testing Extensible Language Debuggers}
-%\title{A DSL for Testing Debuggers}
-\title{DeTeL - A Language for Testing Debuggers}  
+\title{A DSL for Testing Extensible Language Debuggers}
+%\title{Testing Debuggers for Extensibe Language}  
 
 \author{\IEEEauthorblockN{Domenik Pavletic}
 \IEEEauthorblockA{itemis AG\\
@@ -287,17 +287,21 @@ kim.hasslbauer@gmail.com
 \maketitle
 
 \begin{abstract}
-Debugging is an essential aspect of any language development framework. While
-this also applies to extensible languages, there, debuggers are even more
-complex and require therefore more effort on testing. 
-To ease testing of debuggers we propose in this paper \emph{DeTeL} a language
-for testing debuggers. 
+Extensible languages enable incremental extensions of a host
+language with domain specific abstractions. Debuggers for such languages must be
+extensible as well to support debugging of different language extensions at the
+same abstraction level. Because those languages evolve over time, it
+is essential to constantly verify debugger behavior matches the
+expected behavior. To ensure the debugging behavior with testing, a \ac{GPL} can
+used, however raises accidential complexity and lowers the readability of tests. 
+To solve both problems for testing of debuggers we propose in this paper
+\emph{DeTeL} a \ac{DSL} for testing debuggers. 
 \end{abstract}
 
 \begin{IEEEkeywords}
 % those terms are not on the IEEE keyword index:
 %Extensible Languages, Domain-Specific Languages, Debuggers, Testing.
-Formal languages, Software debugging, Software testing.
+Software debugging, Software testing.
 \end{IEEEkeywords}
 
 
