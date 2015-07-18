@@ -16,7 +16,7 @@ building debugging support, the \ic{Editor} aspect is irrelevant.
 \section{Language Extension for Unit Testing}
 
 To give an idea of building language and debugger extensions, we first 
-build an extension for writing 
+build an extension \emph{MUnit} for writing 
 unit tests, and the corresponding debugger extension. Later,
 we will describe how to test this debugger extension with a \ac{DSL}. 
 
@@ -33,10 +33,10 @@ that make up the test. Further, to have the same scope as \ic{Function}
 \ic{TestcaseRef}, which refer to \ic{Testcase}s to be executed.
 
 \begin{figure}[h]
-  \vspace{-3mm}
+  \vspace{-4mm}
   \centering
-    \includegraphics[width=8.5cm]{./figures/unitTestingLangUML2.png} 
-    \vspace{-3mm} 
+    \includegraphics[width=8.7cm]{./figures/unitTestingLangUML2.png} 
+    \vspace{-4mm} 
     \caption{Language structure}
   \label{fig:UnitTestStructure}
   \vspace{-5mm}
@@ -68,10 +68,11 @@ check(typeof(executeTestExpression) :==: <Int32tType()>);
 
 \subsection{Generator}
 
-The unit testing generator consists of many different transformation rules,
+The \emph{MUnit} generator consists of many different transformation rules,
 which translate code written with the language directly to mbeddr C. \lst{lst:generatedUT} shows
-on the left hand side an example program, written with mbeddr C and the unit
-testing language. The right hand side shows the C program generated from it.
+on the left hand side an example program, written with mbeddr C and
+\emph{MUnit} language. The right hand side shows the C program generated from
+it.
 While regular mbeddr code is not colored, the boxes show how \ac{AST} nodes from the
 left are translated to C code on the right.
 
@@ -134,7 +135,7 @@ $\colorbox{g7}{\}}$
 \end{minipage} 
 \vspace{-3mm}
 \begin{lstlisting}[caption={Example mbeddr program using the unit test language
-on the left and the C code that has been generated from it on the right.},
+on the left and the C code that has been generated from it on the right},
 language=mbeddr,label=lst:generatedUT]
 \end{lstlisting}
 

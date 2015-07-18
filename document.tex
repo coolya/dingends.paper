@@ -255,11 +255,8 @@ keywordstyle=\bf\scriptsize\ttfamily\color{black},
 
 \begin{document}
 
-%\title{Using the Style File IEEEtran.sty} 
-%\title{Testing Debuggers for Extensible Languages} %!PN
-%\title{A DSL for Testing Extensible Language Debuggers}
-\title{A DSL for Testing Extensible Language Debuggers}
-%\title{Testing Debuggers for Extensibe Language}  
+%\title{Using the Style File IEEEtran.sty}
+\title{Testing Extensible Language Debuggers} 
 
 \author{\IEEEauthorblockN{Domenik Pavletic}
 \IEEEauthorblockA{itemis AG\\
@@ -287,23 +284,23 @@ kim.hasslbauer@gmail.com
 \maketitle
 
 \begin{abstract}
-Extensible languages enable incremental extensions of a host
+Extensible languages allow incremental extensions of a host
 language with domain specific abstractions. Debuggers for such languages must be
-extensible as well to support debugging of different language extensions at the
-same abstraction level. Because those languages evolve over time, it
-is essential to constantly verify debugger behavior matches the
-expected behavior. To ensure the debugging behavior with testing, a \ac{GPL} can
-used, however raises accidential complexity and lowers the readability of tests. 
-To solve both problems for testing of debuggers we propose in this paper
-\emph{DeTeL} a \ac{DSL} for testing debuggers. 
+extensible as well to support debugging of different language extensions at
+their corresponding abstraction level. As such languages evolve over
+time, it is essential to constantly verify their debugging behavior.
+For this purpose, a \ac{GPL} can be used, however this increases the
+complexity and decreases the readability of tests.
+To reduce continuous verification effort, in this paper, we introduce 
+\emph{DeTeL} a \ac{DSL} for testing extensible language debuggers.
 \end{abstract}
 
 \begin{IEEEkeywords}
 % those terms are not on the IEEE keyword index:
 %Extensible Languages, Domain-Specific Languages, Debuggers, Testing.
-Software debugging, Software testing.
+Formal languages, Software debugging, Software testing.
 \end{IEEEkeywords}
-
+\vspace{-1mm}
 
 \input{acronyms}
 \input{chapters/introduction}

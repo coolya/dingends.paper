@@ -5,9 +5,10 @@ The debugger testing \ac{DSL} \emph{DeTeL} must allow us to verify at least
 four aspects: call stack, program state, breakpoints and stepping.
 To cover these requirements in \emph{DeTeL} we delineate in this section design
 decisions and their implementation strategy. While we consider some of those
-design decisions as required (\textbf{R}), others are either optional
-(\textbf{O}) or specific to mbeddr (\textbf{M}):
+design decisions as required (\textbf{R}), others are either context 
+(\textbf{CS}) or mbeddr specific (\textbf{MS}).
 
+\subsection{Required}
 
 \textbf{\label{R1}R1 Debug state validation:} In our test cases we
 must be able to validate the call stack, and for each of its frames 
@@ -28,7 +29,9 @@ This integration is required for specifying in programs under test
 locations where to break (see \hyperref[R2]{R2}) and for validating where
 program execution is suspended (see \hyperref[R1]{R1}).
 
-\textbf{\label{O1}O1 Reusability:} For writing debugger tests in
+\subsection{Context Specific}
+
+\textbf{\label{CS1}CS1 Reusability:} For writing debugger tests in
 an efficient way, we expect from \emph{DeTeL} the ability to provide reuse: (1)
 test data, (2) validation rules and (3) the structure of tests. First covers
 the ability to have one mbeddr program as test data for multiple test cases.
@@ -36,7 +39,7 @@ Second refers to single definition and multiple usage of validation rules among
 different test cases. Finally, third refers to extending test cases and
 having the possibility to specialize them.
 
-\textbf{\label{O2}O2 Extensibility:} 
+\textbf{\label{CS2}CS2 Extensibility:} 
 
 Languages should provide support for contributing new
 validation rules thus achieving extensibility. Those new rules can be used for
@@ -45,13 +48,15 @@ upcoming support for multi-level debugging~\cite{MultiLevelDebugging:WSRE:breake
 or for writing tests more efficiently.
 
 
-\textbf{\label{O3}O3 Automated test execution:} For fast
+\textbf{\label{CS3}CS3 Automated test execution:} For fast
 feedback about newly introduced debugger bugs, 
 we require the ability to integrate our 
 tests into an automatic execution environment (\eg an \ic{IDE} or a build
 server).
 
-\textbf{\label{M1}M1 Exchangeable debugger backends:}
+\subsection{Mbeddr Specific}
+
+\textbf{\label{MS1}MS1 Exchangeable debugger backends:}
 
 mbeddr targets the embedded domain where platform vendors require different
 compilers and debuggers. Hence, we require the ability to run our tests against
