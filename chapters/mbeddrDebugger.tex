@@ -2,14 +2,21 @@
 \label{mbeddrDebugger}
 \label{mbeddrDebuggerFramework}
 
+
+
 mbeddr comes with a debugger, which allows users to debug their mbeddr code 
-on the abstraction levels of the used languages. For that, each language
-contributes a debugger extension, which is build with a framework also provided
-by mbeddr~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}.
-Debugging support is implemented specifically for the language by
-lifting the call stack/program state from the base-level to the
+on the abstraction levels of the used languages. 
+For that, each language contributes a debugger extension, which is
+built with a framework also provided by mbeddr~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}.
+Those extensions are always language-specific in contrast to 
+domain-specific debuggers (\eg the moldable
+debugger~\cite{DBLP:conf/sle/ChisGN14}), 
+which provide application-specific debug actions and views on the program
+state.
+Hence, debugging support is implemented specifically for the language
+by lifting the call stack/program state from the base-level to the
 extension-level (see \fig{infoFlow}) and stepping/breakpoints
-vice versa.
+vice versa. 
 
 \begin{figure}[h]
   \vspace{-3mm}
@@ -30,11 +37,13 @@ debugging semantics of language concepts.
 Second, a runtime for executing those specifications and
 thus achieving the mapping described in~\fig{infoFlow}. 
 
-In this paper, we focus only on the specification part (see
-\fig{specabs}) required for understanding how the debugger extension
-for \emph{MUnit} is build.
-Further details about the architecture and its implementation with \ac{MPS} are
-described in \cite{DBLP:conf/adaEurope/AdaEuropeDeb}. 
+In this section, we provide an overview of the specification part (see
+\fig{specabs}) that is required for understanding how the debugger extension
+for \emph{MUnit} is built.
+While this paper concentrates on testing debuggers for extensible languages,
+we have published another paper~\cite{DBLP:conf/adaEurope/AdaEuropeDeb}
+describing details about the debugger framework and its implementation
+with \ac{MPS}.
 
 
 \subsection{Breakpoints}
@@ -81,12 +90,12 @@ contribute at least one \ic{StackFrame}.
   \vspace{-2mm}
 \end{figure}
 
-\section{Debugger Extension for MUnit Language}
+\section{Debugger Extension for the MUnit Language}
 
 This section describes the implementation of a debugger extension
-for \emph{MUnit} language. This extension is defined with mbeddr's
+for the \emph{MUnit} language. This extension is defined with mbeddr's
 debugger specification \ac{DSL} and the abstractions of the debugging
-meta-model is shown in \fig{specabs}.
+meta-model shown in \fig{specabs}.
 
 \subsection{Breakpoints}  To enable
 breakpoints on \ic{AssertStatement}s, 
@@ -94,29 +103,22 @@ an implementation of the \ic{Breakable} interface is required.
 \ic{Assert- Statement} is derived from \ic{Statement} that already implements
 this interface, thus breakpoints are supported already.
 
-\subsection{Call Stack}
+\subsection{Watches} 
 
-\ic{Testcase} and \ic{ExecuteTestExpression} are translated to 
-base-level callables and therefore implement
-\ic{StackFrame- Contributor}. They contribute \ic{StackFrame}s, 
-each is linked to a base-level stack frame and
-states whether it is visible in the extension-level call stack or not.
+Since \ic{ExecuteTestExpression}'s  stack frame is not shown in the high-level
+call stack, none of its watches are mapped.
+In contrast,  stack frames for \ic{Testcase}s are visible thus we need
+to consider its watches. In case of \ic{Testcase}, the 
+\ic{LocalVariableDeclaration} \_f has no corresponding
+representation on the extension-level, and should therefore not be shown. The
+mbeddr debugger framework has a pessimistic approach for lifting watches:
+watches that should not be shown in the \ic{UI} are marked as \emph{hidden}.
+Otherwise, the debugger shows the low-level watch (in this case the C local
+variable \_f) with its respective value.
 
-The implementation of  \ic{ExecuteTestExpression} links the
-low-level stack frame to the respective instance (see listing below).
-Additionally, it hides the stack frame 
-from the high-level call stack.
-
-\begin{lstlisting}[language=debuggerDSL,frame=single]
-contribute frame mapping for frames.select(name=getName());
+\begin{lstlisting}[frame=single,language=debuggerDSL]
+hide local variable with identifier "_f";
 \end{lstlisting}
-
-Similarly the mapping for \ic{Testcase} also requires linking the
-low-level stack frame to the respective instance. However, 
-it declares to \emph{show} the stack frame in the high-level call stack.
-Further, we provide the name of the actual \ic{Testcase}, which is represented
-in the call stack view: Consider \lst{lst:generatedUT}, where we would
-show the name \ic{forTest} instead of \ic{test\_forTest}.
 
 \subsection{Stepping} 
 
@@ -141,16 +143,26 @@ foreach testRef in this.tests {
 }
 \end{lstlisting}
 
-\subsection{Watches} 
+\subsection{Call Stack}
 
-Since \ic{ExecuteTestExpression}'s  stack frame is not shown in the high-level
-call stack, none of its watches are mapped.
-In contrast,  stack frames for \ic{Testcase}s are visible thus we need
-to consider its watches. In case of \ic{Testcase}, the 
-\ic{LocalVariableDeclaration} \_f has no corresponding
-representation on the extension-level, therefore we hide it from the watches view (the C watch
-would be shown otherwise):
+\ic{Testcase} and \ic{ExecuteTestExpression} are translated to 
+base-level callables and therefore implement
+\ic{StackFrame- Contributor}. They contribute \ic{StackFrame}s, 
+each is linked to a base-level stack frame and
+states whether it is visible in the extension-level call stack or not.
 
-\begin{lstlisting}[frame=single,language=debuggerDSL]
-hide local variable with identifier "_f";
+The implementation of  \ic{ExecuteTestExpression} links the
+low-level stack frame to the respective instance (see listing below).
+Further, it hides the frame from the high-level call stack, since
+\ic{ExecuteTestExpression} has no callable semantics.
+
+\begin{lstlisting}[language=debuggerDSL,frame=single]
+contribute frame mapping for frames.select(name=getName());
 \end{lstlisting}
+
+Similarly the mapping for \ic{Testcase} also requires linking the
+low-level stack frame to the respective instance. However, 
+it declares to \emph{show} the stack frame in the high-level call stack.
+Further, we provide the name of the actual \ic{Testcase}, which is represented
+in the call stack view: Consider \lst{lst:generatedUT}, where we would
+show the name \ic{forTest} instead of \ic{test\_forTest}.

@@ -1,3 +1,4 @@
+\vspace{-1mm}
 \section{mbeddr}
 
 mbeddr~\cite{Voelter:2012:MEC:2384716.2384767} is an extensible version of C
@@ -16,8 +17,8 @@ building debugging support, the \ic{Editor} aspect is irrelevant.
 \section{Language Extension for Unit Testing}
 
 To give an idea of building language and debugger extensions, we first 
-build an extension \emph{MUnit} for writing 
-unit tests, and the corresponding debugger extension. Later,
+build \emph{MUnit}, a language for writing 
+unit tests, and a corresponding debugger extension. Later,
 we will describe how to test this debugger extension with a \ac{DSL}. 
 
 \subsection{Structure}
@@ -27,7 +28,7 @@ we will describe how to test this debugger extension with a \ac{DSL}.
 be used where \ic{Statement}s are expected. It contains an \ic{Expression}
 for the \emph{condition}.
 \ic{Testcase} holds a \ic{StatementList} that contains the \ic{Statement}s
-that make up the test. Further, to have the same scope as \ic{Function}
+that make up the test. Further, to have the same scope as \ic{Function},
 \ic{Testcase} implements \ic{IModuleContent}.
 \ic{ExecuteTestExpression} contains a list of
 \ic{TestcaseRef}, which refer to \ic{Testcase}s to be executed.
@@ -35,8 +36,8 @@ that make up the test. Further, to have the same scope as \ic{Function}
 \begin{figure}[h]
   \vspace{-4mm}
   \centering
-    \includegraphics[width=8.7cm]{./figures/unitTestingLangUML2.png} 
-    \vspace{-4mm} 
+    \includegraphics[width=8.5cm]{./figures/graph-1.png} 
+    \vspace{-5mm} 
     \caption{Language structure}
   \label{fig:UnitTestStructure}
   \vspace{-5mm}
@@ -45,20 +46,20 @@ that make up the test. Further, to have the same scope as \ic{Function}
 \subsection{Type System and Constraints}
 
 \ic{AssertStatement} requires a constraint and a type
-system rule. First restricts the usages only inside \ic{Testcase}s, meaning an
+system rule. It restricts the usages only inside \ic{Testcase}s, meaning an
 \ic{AssertStatement} can only be used in a \ic{Testcase}:
 \begin{lstlisting}[language=constraintsAndTS,frame=single]
 parentNode.ancestor<concept = Testcase, +>.isNotNull
 \end{lstlisting}
 
-Second restricts the type of its child \ic{expr} (\emph{condition}) to
+It also restricts the type of its child \ic{expr} (\emph{condition}) to
 \ic{BooleanType}, so only valid \emph{conditions} can be entered:
 \begin{lstlisting}[language=constraintsAndTS,frame=single]
 check(typeof(assertStatement.expr) :<=: <BooleanType()>);
 \end{lstlisting}
 
 \ic{ExecuteTestExpression} returns the number of failed unit tests,  
-hence we specify \ic{Int32tType} as its type (see rule below). Later the same
+hence we specify \ic{Int32tType} as its type (see rule below). Later, the same
 type is used in the generator.
 
 \begin{lstlisting}[language=constraintsAndTS,frame=single]
@@ -71,10 +72,9 @@ check(typeof(executeTestExpression) :==: <Int32tType()>);
 The \emph{MUnit} generator consists of many different transformation rules,
 which translate code written with the language directly to mbeddr C. \lst{lst:generatedUT} shows
 on the left hand side an example program, written with mbeddr C and
-\emph{MUnit} language. The right hand side shows the C program generated from
-it.
-While regular mbeddr code is not colored, the boxes show how \ac{AST} nodes from the
-left are translated to C code on the right.
+\emph{MUnit}. The right hand side shows the C program generated from
+it. While regular mbeddr C code is not colored, the boxes indicate how \ac{AST}
+nodes from the left are translated to C code on the right.
 
 \vspace{-2mm}
 \noindent 

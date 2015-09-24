@@ -1,23 +1,28 @@
 \section{Debugger Testing DSL}
 
-\emph{DeTeL} is integrated in \ic{MPS} and interacts
+\emph{DeTeL} is open-source and is shipped as part of
+mbeddr~\cite{mbeddrGithub}.
+It is integrated in \ic{MPS} and interacts
 with mbeddr's debugger \ic{API}. This language is currently tightly
 coupled to mbeddr, however it could interact with a generic debugger \ic{API}
 and could be implemented independent of \ac{MPS}.
 This section describes the structure of \emph{DeTeL} and the
-implementation of design decisions discussed in \sect{DesignDecisions}.
+implementation of requirements discussed in \sect{DesignDecisions}. 
+The syntax is not documented, but can easily be derived by looking at the
+\emph{DeTeL}'s editor definitons in \ac{MPS}. 
 
 \subsection{DebuggerTest}
+\label{DebuggerTestSection}
 
 \fig{fig:DebuggerTestStructure} shows the structure of 
 \ic{DebuggerTest}, which is a module that \emph{contains} 
-\ic{ITestContent}s, currently implemented by 
+\ic{IDebuggerTestContent}s, currently implemented by 
 \ic{DebuggerTestcase} and \ic{CallStack} (described later). This interface
 facilitates extensibility inside
 \ic{DebuggerTest} (\hyperref[CS2]{CS2}). Further, \ic{DebuggerTest} refers to 
 a \ic{Binary}, which is a concept from mbeddr representing the compiled mbeddr
 program under test (\hyperref[R3]{R3}), 
-the \emph{imports} of \ic{ITestContent}s from
+the \emph{imports} of \ic{IDebuggerTestContent}s from
 other \ic{DebuggerTest}s (\hyperref[CS1]{CS1}) and an
 \ic{IDebuggerBackend} that specifies the debugger backend 
 (\hyperref[CS2]{CS2}, \hyperref[MS1]{MS1}). The later is implemented by
@@ -38,15 +43,15 @@ other \ic{DebuggerTest}s (\hyperref[CS1]{CS1}) and an
 \ac{MPS} already contains the language \ic{mps.lang.test} for writing type
 system and editor tests. This allows (1) automatic execution
 of tests on the command-line and 
-(2) visualization of test results in a table view.
-All of that functionality is build for future implementations of \ic{ITestcase} - an
-interface from \ic{mps.lang.test}. By implementing this interface in
+(2) visualization of test results in a table view inside \ac{MPS}.
+All of that functionality is built for future implementations of \ic{ITestcase}
+- an interface from \ic{mps.lang.test}. By implementing this interface in
 \ic{DebuggerTest} (our container for \ic{DebuggerTestcase}s), we benefit from
 available features (\hyperref[CS3]{CS3}).
 
 \subsection{CallStack}
 
-\ic{CallStack} implements \ic{ITestContent} 
+\ic{CallStack} implements \ic{IDebuggerTestContent} 
 (see \fig{fig:CallStackStructure}) and contains
 \ic{IStackFrame}s (\hyperref[CS2]{CS2}, \hyperref[R1]{R1}),
 which has two implementations:
@@ -66,7 +71,7 @@ each inherited \ic{StackFrame}.
   \label{fig:CallStackStructure}
 \end{figure}
 
-\ic{IStackFrame} has three parts each with two different implementations: a
+\ic{IStackFrame} has three parts, each with two different implementations: a
 \emph{name} (\ic{IName}), a location where program execution
 should suspend (\ic{ILocation}) and visible \emph{watches}
 (\ic{IWatch}es). 
@@ -122,14 +127,14 @@ be modified. Finally, \ic{OnPlatform} specifies a \ic{Platform}
 (\emph{Mac}, \emph{Unix} or \emph{Windows}) and executes 
 platform specific tests (\hyperref[R1]{R1}).
 
-\section{Testing the Debugger Extension}
+\section{Writing Debugger Tests}
 
 In this section, we describe an application scenario where we apply \emph{DeTeL}  
 to test the debugger extension of \ic{MUnit}. 
 
-Before writing tests, the program using \ic{MUnit}
-in \lst{lst:generatedUT} is annotated in \lst{lst:annotatedProg} with
-\ic{ProgramMarker}s. They are later used by \ic{DebuggerTestcase}s 
+Before writing debugger tests, we first take the program using \ic{MUnit}
+from \lst{lst:generatedUT} and annotate it in \lst{lst:annotatedProg}
+with \ic{ProgramMarker}s. Those markers are later used by \ic{DebuggerTestcase}s 
 for specification and verification of code locations where program
 execution should suspend.
 
@@ -138,13 +143,15 @@ program,label=lst:annotatedProg]
 int32 main(int32 argc, string$[$ $]$ argv) {
    [return test$[$forTest$]$;] onReturnInMain
 }
-
+int32 add(int32 a, int32 b) {
+   [return a+b;] inAdd
+}
 testcase forTest {
-   [int32 sum = 0;] onSumVarDeclaration
-   [assert: sum == 0;] on1stAssertInTestcase
-   [int32$[$ $]$ nums = {1, 2, 3};] onNumsVarDeclaration
+   [int32 sum = 0;] onSumDeclaration
+   [assert: sum == 0;] firstAssert
+   [int32$[$ $]$ nums = {1, 2, 3};] onArrayDecl
    for(int32_t i=0;i<3;i++) { sum += nums[i]; }
-   [assert: sum == 6;] onLastStmntInTestcase
+   [assert: sum == 6;] secondAssert
 }
 \end{lstlisting}	
 
@@ -159,7 +166,6 @@ Additionally, it instructs the debugger runtime to execute tests with the
 label=lst:DebuggerTestingStub]
 DebuggerTest UnitTesting    tests binary: UnitTestingBinary {
                             uses debugger: gdb
-
 }  
 \end{lstlisting}
 
@@ -169,25 +175,26 @@ For testing \emph{step into} on instances of \ic{Execute- TestExpression},
 in the \lst{lst:callStacks}, we create a \ic{CallStack} that specifies
 the stack organization after performing \emph{step
 into} on \emph{onReturnInMain}. To reuse information and 
-minimize redundancy in later
+minimize redundancy in subsequent
 \ic{DebuggerTestcase}s, two separate 
-\ic{CallStack}s are created: First, \emph{inMain} 
+\ic{CallStack}s are created: First, \emph{csInMainFunction} 
 contains a single \ic{StackFrame} that expects (1) program execution to suspend
 at \emph{onReturnInMain} and (2) two \ic{Watch}es (\emph{argc} and
-\emph{argv}). Second, \emph{inTestcase} extends \emph{inMain} by adding an
+\emph{argv}). Second, \emph{csInTestcase} extends \emph{csInMainFunction} by adding an
 additional \ic{StackFrame} \emph{forTest} on top of the \ic{StackFrameExtension}
 \emph{main} (colored in gray). This \ic{StackFrame} specifies two \ic{Watch}es
-(\emph{sum} and \emph{nums}) and has no location (\ic{AnyLocation}).
+(\emph{sum} and \emph{nums}) and specifies no specific location
+(\ic{AnyLocation}).
 
 \begin{lstlisting}[language=testingDSL,caption=\ic{CallStack} declarations,
 label=lst:callStacks]
-call stack inMain {
+call stack csInMainFunction {
    0:main
       location: onReturnInMain
       watches: {argc, argv}                     
 }
-   
-call stack inTestcase extends inMain {
+
+call stack csInTestcase extends csInMainFunction {
    1:forTest
       location: <any>
       watches: {sum, nums}                  
@@ -196,12 +203,12 @@ call stack inTestcase extends inMain {
 \end{lstlisting}
 
 \lst{lst:stepIntoTestcase} contains the \ic{DebuggerTestcase}
-\emph{stepIntoTestcase}, which uses the \ic{CallStack} \emph{inTestcase}
+\emph{stepIntoTestcase}, which uses the \ic{CallStack} \emph{csInTestcase}
 to verify \emph{step into} for instances of \ic{ExecuteTestExpression}. As
 a first step, program execution is suspended at \emph{onReturnInMain}, next, a
 single \ic{StepInto} is performed before the actual call stack is validated against
-a custom \ic{CallStack} derived from \emph{inTestcase}.
-This custom declaration specializes \ic{StackFrame}
+a custom \ic{CallStack} derived from \emph{csInTestcase}.
+This custom declaration specializes the \ic{StackFrame}
 \emph{forTest} \ie program execution is expected to suspend at
 \emph{onSumDeclaration}.
 
@@ -213,7 +220,7 @@ testcase stepIntoTestcase {
    then perform:                         
       step into 1 times    
    finally validate:                         
-      call stack stepIntoTestcase extends inTestcase {
+      call stack csOnSumDeclInTestcase extends csInTestcase {
          $\gT{1}$$\gT{:}$$\gT{forTest}$
             overwrite location: onSumDeclaration
             $\gT{watches}$$\gT{:}$ $\gT{\{}$$\gT{sum, nums}$$\gT{\}}$
@@ -227,22 +234,22 @@ testcase stepIntoTestcase {
 After verifying \emph{step into} for \ic{ExecuteTestExpression}, 
 \emph{step into} and \emph{over} for \ic{AssertStatement} is verified
 next. Both stepping commands have the same result when performed at
-\emph{1stAssert}, hence common test behavior is extracted into the
+\emph{firstAssert}, hence common test behavior is extracted into the
 \emph{abstract} \ic{DebuggerTestcase} \emph{stepOnAssert} as shown in
 \lst{lst:AbstractDebuggerTest}: (1) program
-execution suspends at \emph{1stAssert}, a custom \ic{CallStack} verifies 
-(2) program execution suspended in \emph{forTest} on \emph{onArrayDecl} and
-(3) the \ic{Watch} \emph{num} has the \ic{PrimitiveValue} zero.
+execution suspends at \emph{firstAssert}, (2) a custom \ic{CallStack} verifies 
+program execution suspended in \emph{forTest} on \emph{onArrayDecl} and
+(3) the \ic{Watch} \emph{num} holds the \ic{PrimitiveValue} zero.
  
 \begin{lstlisting}[language=testingDSL,caption=Abstract \ic{DebuggerTestcase},
 label=lst:AbstractDebuggerTest]
 abstract testcase stepOnAssert {
    suspend at: 
-      1stAssert
+      firstAssert
    finally validate:
-      call stack stepOnAssert extends inTestcase {
+      call stack csOnArrayDeclInTestcase extends csInTestcase {
          1:forTest
-            overwrite location:   onArrayDecl
+            overwrite location: onArrayDecl
             overwrite watches: {sum=0,nums}
          0:main                      
       }
@@ -268,20 +275,20 @@ testcase stepOverAssert extends stepOnAssert {
 \subsection{Step on last Statement in Testcase}
 
 The last testing scenario verifies that stepping on the last \ic{Statement}
-(\emph{2ndAssert}) inside a \ic{Testcase} suspends execution on the 
+(\emph{secondAssert}) inside a \ic{Testcase} suspends execution on the 
 \ic{ExecuteTestExpression} (\emph{onReturnInMain}).
 Again, we create an \emph{abstract} \ic{DebuggerTestcase}
 \emph{steppingOnLastStmnt} that suspends
-execution on \emph{2ndAssert} and verifies if the actual call stack has the same
-structure as \ic{CallStack} \emph{inMain}:
+execution on \emph{secondAssert} and verifies that the actual call stack has the
+same structure as \ic{CallStack} \emph{csInMainFunction}:
 
 \begin{lstlisting}[language=testingDSL,
 caption=Assumptions after suspending program execution in \emph{main}]
 abstract testcase steppingOnLastStmnt {
    suspend at: 
-      2ndAssert
+      secondAssert
    finally validate:
-      call stack inMain
+      call stack csInMainFunction
 }
 \end{lstlisting}
 
@@ -306,5 +313,35 @@ testcase stepOutFromLastStmnt extends steppingOnLastStmnt {
       step out 1 times                            
 }
 \end{lstlisting}		
-			
-	
+
+In each \ic{DebuggerTestcase} from the listing above execution suspends on the
+same \ic{Statement} (\emph{OnReturnInMain}), although different stepping
+commands are performed. Remember, since \emph{secondAssert} does not contain
+any children of type \ic{StepIntoable} (\eg \ic{FunctionCall}), performing a
+\emph{step into} on the \ic{Statement} has the same effect as
+a \emph{step over}.
+
+\section{Executing Debugger Tests}
+
+Our test cases from the previous section are generated to plain Java code and
+can be executed from within \ac{MPS} with an action from the
+context menu. This functionality is obtained by implementing \ic{ITestcase} in
+\ic{DebuggerTest} (see \sect{DebuggerTestSection}).
+By executing this action, test results are visualized in a table view, provided
+by \ac{MPS}: for each \ic{DebuggerTestcase}, the result (successful or
+failed) is indicated with a colored bubble and a textbox shows the output.
+
+As indicated by a green bubble on the left side of \fig{fig:TestExecution1}, all
+of our previously written \ic{DebuggerTestcase}s pass. 
+We show in the next section how language evolution will invalidate the debugger
+definition and this way cause all tests to fail.
+
+\begin{figure}[h]
+	\vspace{-2mm}
+	\centering
+    \includegraphics[width=8.5cm]{./figures/debuggerTestExec.png} 
+    \vspace{-3mm}
+	\caption{Executing \ic{DebuggerTestcase}s in \ac{MPS}}
+	\label{fig:TestExecution1}
+	\vspace{-3mm}
+\end{figure}

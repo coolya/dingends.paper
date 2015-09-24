@@ -149,8 +149,8 @@ keywordstyle=\bf\scriptsize\ttfamily\color{black},
 }
 
 \lstdefinelanguage{markerDSL}
-{keywords={onSumVarDeclaration,onReturnInMain,on1stAssertInTestcase,
-onNumsVarDeclaration,onLastStmntInTestcase},
+{keywords={
+onReturnInMain,onSumDeclaration,firstAssert,onArrayDecl,secondAssert},
 otherkeywords={[,]},
 frame=single,
 numbers=left,
@@ -169,7 +169,7 @@ keywordstyle=\bf\scriptsize\ttfamily\color{black},
 
 \lstdefinelanguage{testingDSL}
 {keywords={DebuggerTest,TestCase,tests,binary,uses,debugger,gdb,
-testcase,suspend,at,then,perform,finally,validate,call,stack,
+testcase,suspend,at,then,perform,finally,validate,call,stack,watches,
 step,into,over,out,times,abstract,extends,location,watchables,any,overwrite
 % assert(0),assert(1),assert(2),assert(3),assert(4),
 % assert(5),assert(6),assert(7),assert(8),assert(9),assert(10),assert(11),assert(12),
@@ -292,7 +292,7 @@ time, it is essential to constantly verify their debugging behavior.
 For this purpose, a \ac{GPL} can be used, however this increases the
 complexity and decreases the readability of tests.
 To reduce continuous verification effort, in this paper, we introduce 
-\emph{DeTeL} a \ac{DSL} for testing extensible language debuggers.
+\emph{DeTeL}, an extensible \ac{DSL} for testing extensible language debuggers.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -308,6 +308,7 @@ Formal languages, Software debugging, Software testing.
 \input{chapters/mbeddrDebugger}
 \input{chapters/requirements}
 \input{chapters/TestingDSL}
+\input{chapters/languageEvolution}
 \input{chapters/relatedwork}
 \input{chapters/SummaryAndFutureWork}
 

@@ -8,7 +8,7 @@ that provide domain-specific abstractions expressed with a \ac{GPL}.
 This approach has very limited support for static semantics, \eg 
 no support for modifying constraints or type system.
 % first appraoch is about internal DSLs?
-Second approach is to use external \acp{DSL} for 
+The second approach is to use external \acp{DSL} for 
 expressing solutions to domain problems. This approach 
 has some other drawbacks: 
 these \acp{DSL} are not inherently extensible.
@@ -24,15 +24,16 @@ language (using an existing debugger for the base language).
 A debugger for an extensible language must be extensible as well, to support
 debugging of modular language extensions at the same abstraction level
 (extension-level).
-Minimally, this means that users can step through the constructs 
-provided by the extension and see watch expressions related to the extensions.
+Minimally, this means users can step through constructs 
+provided by the extension and see watch expressions (\eg variables) related to
+the extensions.
 
 % fix this part (we might have a fitting sentence somewhere)
 Because language extensions can be based on other extensions and languages
 evolve over time, it is essential to constantly test if debugger
-behavior matches the expected behavior. To ensure debugging behavior with
-testing, a \ac{GPL} can used, however this raises the same issues
-discussed above. 
+behavior matches the expected behavior. To test debugging
+behavior, a \ac{GPL} can be used, however this raises
+the same issues discussed above. 
 % ToDo: double check it!
-We therefore propose in this paper a \ac{DSL} 
-for testing debuggers. 
+We therefore propose in this paper \emph{DeTeL} (Debugger Testing Language), an
+extensible \ac{DSL} for testing debuggers. 

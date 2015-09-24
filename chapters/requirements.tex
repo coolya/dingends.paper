@@ -1,27 +1,36 @@
-\section{Design Decisions}
+\section{Requirements}
 \label{DesignDecisions}
 
-The debugger testing \ac{DSL} \emph{DeTeL} must allow us to verify at least
+The debugger testing \ac{DSL} must allow us to verify at least
 four aspects: call stack, program state, breakpoints and stepping.
-To cover these requirements in \emph{DeTeL} we delineate in this section design
-decisions and their implementation strategy. While we consider some of those
-design decisions as required (\textbf{R}), others are either context 
-(\textbf{CS}) or mbeddr specific (\textbf{MS}).
+To cover these requirements in \emph{DeTeL} we delineate in this section
+requirements and their implementation strategy. While we
+consider some of those requirements as required (\textbf{R}), others are either
+context (\textbf{CS}) or mbeddr specific (\textbf{MS}).
 
 \subsection{Required}
 
-\textbf{\label{R1}R1 Debug state validation:} In our test cases we
-must be able to validate the call stack, and for each of its frames 
-the program state and the location where execution is suspended. 
-The call stack itself is validated by specifying the expected stack
-frames with their respective names. In terms of program state, we need to verify
-the names of watches and their respective values, which can either be simple
+\textbf{\label{R1}R1 Debug state validation:} 
+
+Changes in generators can modify names of generated procedures or
+variables and this way, \eg invalidate program state lifting in the the
+debugger.
+For being able to identify those problems, we need a  possibility to validate
+the call stack, and for each of its frames the program state and the location where
+execution is suspended. For the call stack,
+a specification of expected stack frames with their respective names is
+required. In terms of program state, we need to verify the names of watches 
+and their respective values, which can either be simple
 or complex. Further, a location specifies where program execution is
 expected to suspend and tests can be written for a specific platform. 
 
-\textbf{\label{R2}R2 Debug control:} In order to test stepping
-and breakpoints, we require the ability to execute stepping commands
-(in, over and out) and specify locations where to break.
+\textbf{\label{R2}R2 Debug control:} Similarly as in \hyperref[R1]{R1},
+generator changes also affect the stepping behavior. 
+Consider changing the \ic{FunctionCall} generator to inline called
+functions instead of calling them. This change would require modifactions in the
+implementation of \emph{step into} as well. For being able to identify
+those problems, we need the ability to execute stepping commands (in, over
+and out) and specify locations where to break.
 
 \textbf{\label{R3}R3 Language integration:} The
 \ac{DSL} must integrate with language extensions.
@@ -33,11 +42,11 @@ program execution is suspended (see \hyperref[R1]{R1}).
 
 \textbf{\label{CS1}CS1 Reusability:} For writing debugger tests in
 an efficient way, we expect from \emph{DeTeL} the ability to provide reuse: (1)
-test data, (2) validation rules and (3) the structure of tests. First covers
+test data, (2) validation rules and (3) the structure of tests. The first covers
 the ability to have one mbeddr program as test data for multiple test cases.
-Second refers to single definition and multiple usage of validation rules among
-different test cases. Finally, third refers to extending test cases and
-having the possibility to specialize them.
+The second refers to single definition and multiple usage of validation rules
+among different test cases. Finally, the third refers to extending test cases
+and having the possibility to specialize them.
 
 \textbf{\label{CS2}CS2 Extensibility:} 
 
