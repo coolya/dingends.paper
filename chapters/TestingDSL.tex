@@ -9,7 +9,7 @@ and could be implemented independent of \ac{MPS}.
 This section describes the structure of \emph{DeTeL} and the
 implementation of requirements discussed in \sect{DesignDecisions}. 
 The syntax is not documented, but can easily be derived by looking at the
-\emph{DeTeL}'s editor definitons in \ac{MPS}. 
+\emph{DeTeL}'s editor definitions in \ac{MPS}. 
 
 \subsection{DebuggerTest}
 \label{DebuggerTestSection}
@@ -56,10 +56,10 @@ available features (\hyperref[CS3]{CS3}).
 \ic{IStackFrame}s (\hyperref[CS2]{CS2}, \hyperref[R1]{R1}),
 which has two implementations:
 \ic{StackFrame} and \ic{StackFrameExtension}.
-An \emph{extend}ing \ic{CallStack} can declare additional
-\ic{StackFrame}s, which contains a \ic{StackFrameExtension}, with the
-possibility of specializing inherited properties (\hyperref[CS1]{CS1}), for
-each inherited \ic{StackFrame}.
+An \emph{extend}ing \ic{CallStack} inherits all \ic{StackFrame}s
+from the extended \ic{CallStack} in the form of \ic{StackFrameExtension}s, with
+the possibility of specializing inherited properties (\hyperref[CS1]{CS1}), 
+and can declare additional \ic{StackFrame}s.
 \vspace{1mm}
 
 \begin{figure}[h]
@@ -96,15 +96,15 @@ can be either \ic{PrimitiveValue} (\eg numbers) or \ic{ComplexValue} (\eg arrays
 it can \emph{extend} other \ic{DebuggerTestcase}s (\hyperref[CS1]{CS1}),
 has a \emph{name}, and can be \ic{abstract}. Further it contains the following
 parts: \ic{SuspendConfig}, \ic{SteppingConfig} and
-\ic{Validation- Config}. Concrete \ic{DebuggerTestcase}s require at least  
+\ic{Validation- Config}. Concrete \ic{DebuggerTestcase}s require  
 a \ic{SuspendConfig} and a \ic{ValidationConfig} (can be inherited),
 while an \ic{abstract} \ic{DebuggerTestcase} requires none of these.
  
 \begin{figure}[h]
-	\vspace{-2mm}
+	\vspace{-3mm}
 	\centering
-    \includegraphics[width=8.5cm]{./figures/graph4-1.png} 
-    \vspace{-2mm}
+    \includegraphics[width=8.7cm]{./figures/graph4-3.png} 
+    \vspace{-3mm}
 	\caption{Structure of \ic{DebuggerTestcase}}
 	\label{fig:DebuggerTestcaseStructure}
 	\vspace{-2mm}
@@ -231,9 +231,10 @@ testcase stepIntoTestcase {
 \vspace{-1mm}
 \subsection{Step into/over AssertStatement}
 
-After verifying \emph{step into} for \ic{ExecuteTestExpression}, 
-\emph{step into} and \emph{over} for \ic{AssertStatement} is verified
-next. Both stepping commands have the same result when performed at
+After verifying \emph{step into} for
+\ic{ExecuteTestExpression} in the previous section, we now test \emph{step into}
+and \emph{over} for \ic{AssertStatement}. Both stepping commands have 
+the same result when performed at
 \emph{firstAssert}, hence common test behavior is extracted into the
 \emph{abstract} \ic{DebuggerTestcase} \emph{stepOnAssert} as shown in
 \lst{lst:AbstractDebuggerTest}: (1) program
@@ -324,12 +325,13 @@ a \emph{step over}.
 \section{Executing Debugger Tests}
 
 Our test cases from the previous section are generated to plain Java code and
-can be executed from within \ac{MPS} with an action from the
+can be executed in \ac{MPS} with an action from the
 context menu. This functionality is obtained by implementing \ic{ITestcase} in
 \ic{DebuggerTest} (see \sect{DebuggerTestSection}).
 By executing this action, test results are visualized in a table view, provided
-by \ac{MPS}: for each \ic{DebuggerTestcase}, the result (successful or
-failed) is indicated with a colored bubble and a textbox shows the output.
+by \ac{MPS}: for each \ic{DebuggerTestcase}, the result (success or
+fail) is indicated with a colored bubble and a text field shows the
+process output.
 
 As indicated by a green bubble on the left side of \fig{fig:TestExecution1}, all
 of our previously written \ic{DebuggerTestcase}s pass. 

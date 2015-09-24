@@ -11,9 +11,9 @@ rules, our work contributes the language for testing the debugger aspect.
 
 The \ac{LLVM} project~\cite{LLDB} comes with a C debugger named \ac{LLDB}.
 Test cases for this debugger are written in Python
-and the unittest framework of Python. While those tests verify the 
-command line interface and the scripting API of the debugger, they also test
-other functionality, such as using the help menu or changing the debugger settings.
+and the unit test framework of Python. While those tests verify the 
+command line interface and the scripting \ac{API} of the debugger, they also
+test other functionality, such as using the help menu or changing the debugger settings.
 Further, some of the \ac{LLDB} tests verify the debugging behavior on different
 platforms, such as Darwin, Linux or FreeBSD. In contrast, we only concentrate on
 testing the debugging behavior and we also support writing tests against
