@@ -51,10 +51,11 @@ language=mbeddr,label=lst:newGeneratedUT]
 Because of our generator modification, \ic{ExecuteTestEx- pression} is not
 reduced to a \ic{Function}, but to an \ic{Expression}. However, we have not
 updated the debugger extension, therefore, the call stack construction for all test cases
-will fail and this way the tests will fail as well. Although those debugger
-tests fail, they are still valid, because they are written on the abstraction level of
+fails and this way the tests fail as well (see \fig{fig:TestExecution2}).
+Although those debugger tests fail, they are still valid, because they 
+are written on the abstraction level of
 the languages, not the generator. The next section shows how we update the
-debugger extension to solve the call stack construction problem.
+debugger extension to solve the call stack construction.
 
 \begin{figure}[h]
 	\vspace{-2mm}
@@ -72,8 +73,8 @@ Because \ic{ExecuteTestExpression} is generated to an \ic{Expression} containing
 calls to the referenced \ic{Testcase}s, our call stack lifting is now wrong.
 This lifting expects to contribute a \ic{StackFrame} for the generated
 \ic{Function}, which is not generated anymore.
-To solve the problem, we remove the implementation of \ic{StackFrameContributor} from
-\ic{ExecuteTestExpression}. Other aspects such as stepping, breakpoints
+To solve the problem, we simply remove the implementation of
+\ic{StackFrameContributor} from \ic{ExecuteTestExpression}. Other aspects such as stepping, breakpoints
 and watches are not affected by the generator modification and hence do not need
 to be changed. After removing the interface implementation, all of our debugger
 tests pass again.

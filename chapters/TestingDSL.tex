@@ -3,13 +3,13 @@
 \emph{DeTeL} is open-source and is shipped as part of
 mbeddr~\cite{mbeddrGithub}.
 It is integrated in \ic{MPS} and interacts
-with mbeddr's debugger \ic{API}. This language is currently tightly
+with the mbeddr debugger \ic{API}. \emph{DeTeL} is currently tightly
 coupled to mbeddr, however it could interact with a generic debugger \ic{API}
 and could be implemented independent of \ac{MPS}.
 This section describes the structure of \emph{DeTeL} and the
 implementation of requirements discussed in \sect{DesignDecisions}. 
-The syntax is not documented, but can easily be derived by looking at the
-\emph{DeTeL}'s editor definitions in \ac{MPS}. 
+The language syntax is not documented, but can easily be derived by
+looking at its editor definitions in \ac{MPS}. 
 
 \subsection{DebuggerTest}
 \label{DebuggerTestSection}
@@ -183,7 +183,7 @@ at \emph{onReturnInMain} and (2) two \ic{Watch}es (\emph{argc} and
 \emph{argv}). Second, \emph{csInTestcase} extends \emph{csInMainFunction} by adding an
 additional \ic{StackFrame} \emph{forTest} on top of the \ic{StackFrameExtension}
 \emph{main} (colored in gray). This \ic{StackFrame} specifies two \ic{Watch}es
-(\emph{sum} and \emph{nums}) and specifies no specific location
+(\emph{sum} and \emph{nums}) and no specific location
 (\ic{AnyLocation}).
 
 \begin{lstlisting}[language=testingDSL,caption=\ic{CallStack} declarations,

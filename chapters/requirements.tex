@@ -4,18 +4,17 @@
 The debugger testing \ac{DSL} must allow us to verify at least
 four aspects: call stack, program state, breakpoints and stepping.
 To cover these requirements in \emph{DeTeL} we delineate in this section
-requirements and their implementation strategy. While we
+requirements. While we
 consider some of those requirements as required (\textbf{R}), others are either
 context (\textbf{CS}) or mbeddr specific (\textbf{MS}).
 
 \subsection{Required}
 
 \textbf{\label{R1}R1 Debug state validation:} 
-
 Changes in generators can modify names of generated procedures or
-variables and this way, \eg invalidate program state lifting in the the
+variables and this way, \eg invalidate program state lifting in the
 debugger.
-For being able to identify those problems, we need a  possibility to validate
+For being able to identify those problems, we need a  mechanism to validate
 the call stack, and for each of its frames the program state and the location where
 execution is suspended. For the call stack,
 a specification of expected stack frames with their respective names is
@@ -48,9 +47,7 @@ The second refers to single definition and multiple usage of validation rules
 among different test cases. Finally, the third refers to extending test cases
 and having the possibility to specialize them.
 
-\textbf{\label{CS2}CS2 Extensibility:} 
-
-Languages should provide support for contributing new
+\textbf{\label{CS2}CS2 Extensibility:} Languages should provide support for contributing new
 validation rules thus achieving extensibility. Those new rules can be used for
 testing further debugger functionality not covered by \emph{DeTeL} (\eg mbeddr's
 upcoming support for multi-level debugging~\cite{MultiLevelDebugging:WSRE:breakedForInlining}) 
@@ -65,8 +62,7 @@ server).
 
 \subsection{Mbeddr Specific}
 
-\textbf{\label{MS1}MS1 Exchangeable debugger backends:}
-
-mbeddr targets the embedded domain where platform vendors require different
-compilers and debuggers. Hence, we require the ability to run our tests against
+\textbf{\label{MS1}MS1 Exchangeable debugger backends:} mbeddr targets the
+embedded domain where platform vendors require different compilers and debuggers. 
+Hence, we require the ability to run our tests against
 different debugger backends and on different platforms. 
