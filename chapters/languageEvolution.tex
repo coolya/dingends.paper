@@ -3,64 +3,71 @@
 The previous sections have shown how to build a language extension for mbeddr in
 \ac{MPS}, define a debugger for this extension and use \ic{DeTeL} to test its
 debugging behavior.
-This section demonstrates how \ic{DeTeL} is used to locate invalid definitions
+This section demonstrates how \ic{DeTeL} is used to identify invalid definitions
 in debugger extensions after evolving the language.
 
 \subsection{Evolving MUnit}
 
-In this section we modify the MUnit generator to reduce the amount of C
-code that it generates. Currently, the generator reduces an
-\ic{ExecuteTestExpression} to a \ic{FunctionCall} that calls a helper
-\ic{Function}, which then calls the reduced \ic{Testcase}s (see \lst{lst:generatedUT}).
-We modify this generator, so \ic{ExecuteTestExpression} is reduced to
-\ic{FunctionCall}s, which directly call the reduced \ic{Testcase}. In case of
-referencing more than one \ic{Testcase}, the \ic{FunctionCall}s are concatenated
-via \ic{PlusExpression}s to return the overall number of failed
-\ic{Testcase}s. The listing below shows for the \emph{main} \ic{Function}
-from \lst{lst:generatedUT} how our generator change affects the generated code. 
+In this section we modify the MUnit generator to demonstrate how this affects
+the debugger. Currently, the generator reduces an \ic{Testcase} to a
+\ic{Function}, which name is prefixed with \emph{test\_}, 
+followed by the \ic{Testcase} name (see \lst{lst:generatedUT}).
+We now change this generator, so the \ic{Function} name is prefixed
+with \emph{testcase\_}, instead of \emph{test\_}.
+The listing below shows how our example program from \lst{lst:generatedUT} is
+now generated to C.
 
-\vspace{-2mm}
-\noindent 
-\hspace{1.2mm}
-\begin{minipage}[t]{120pt} 
-\begin{lstlisting}[language=reducedMbeddr,numbers=left]
-int32 main(int32 argc,
-		string[] argv) {
-   return $\colorbox{g1}{test[}$$\colorbox{g6}{forTest}$$\colorbox{g1}{]}$;
-}
-\end{lstlisting}
-\end{minipage} 
-\rule[-10ex]{0.1ex}{4.0em}
-\hspace{0.75mm}
-\begin{minipage}[t]{125pt} 
-\begin{lstlisting}[language=reducedMbeddr,numbers=left]
+\noindent
+\begin{minipage}{0.50\columnwidth}
+\begin{lstlisting}[language=reducedMbeddr]
 int32_t main(int32_t argc,
 		char *(argv[])) {
-   return $\colorbox{g6}{test\_forTest()}$;
+   return $\colorbox{g1}{blockexpr\_2()}$;
 }  
+$\colorbox{white}{\hspace{2.5mm}{\color{white}|}}$
+$\colorbox{g1}{int32\_t blockexpr\_2(void) \{}$
+$\colorbox{g1}{\hspace{2.5mm}int32\_t \_f = 0;}$
+$\colorbox{g6}{\hspace{2.5mm}\_f += testcase\_forTest();}$
+$\colorbox{g1}{\hspace{2.5mm}return \_f;}$
+$\colorbox{g1}{\}}$
+\end{lstlisting}  
+\end{minipage}
+\begin{minipage}{0.5\columnwidth}
+\begin{lstlisting}[language=reducedMbeddr]
+$\colorbox{g7}{int32\_t testcase\_forTest() \{}$
+$\colorbox{g7}{\hspace{2.8mm}int32\_t \_f = 0;}$
+   int32_t sum = 0;
+$\colorbox{g3}{\hspace{2.8mm}if(!(}$sum == 0$\colorbox{g3}{)) \{ \_f++; \}}$
+   int32_t[] nums = {1, 2, 3};
+   for(int32_t i=0;i<3;i++){
+     sum += nums[i];
+   }
+$\colorbox{g3}{\hspace{2.8mm}if(!(}$sum == 6$\colorbox{g3}{)) \{ \_f++; \}}$
+$\colorbox{g7}{\hspace{2.8mm}return \_f;}$
+$\colorbox{g7}{\}}$
 \end{lstlisting}
-\end{minipage} 
+\end{minipage}
 \vspace{-4mm}
-\begin{lstlisting}[caption={Parts of the example program
-from \lst{lst:generatedUT} using \emph{MUnit} on the left and the C code
-generated from it with our modified generator},
+\begin{lstlisting}[caption={C code that has been generated with the modified
+\ic{Testcase} generator for the example program from \lst{lst:generatedUT}},
 language=mbeddr,label=lst:newGeneratedUT]
 \end{lstlisting}
+\vspace{-1mm}
 
-
-Because of our generator modification, \ic{ExecuteTestEx- pression} is not
-reduced to a \ic{Function}, but to an \ic{Expression}. However, we have not
-updated the debugger extension, therefore, the call stack construction for all test cases
-fails and this way the tests fail as well (see \fig{fig:TestExecution2}).
-Although those debugger tests fail, they are still valid, because they 
-are written on the abstraction level of
-the languages, not the generator. The next section shows how we update the
-debugger extension to solve the call stack construction.
+Because of our generator modification, \ic{Testcase}s are now generated to
+\ic{Function}s with a different identifier as before. However, we have not
+updated the debugger extension, therefore, the call stack construction for all
+\ic{Testcase}s fails and this way all of our \ic{DebuggerTest}s fail as
+well (see \fig{fig:TestExecution2}).
+Although those debugger tests fail, they are still valid, since they 
+are written on the abstraction level of the languages, not the generator. The
+next section shows how we update the debugger extension to solve the call stack
+construction.
 
 \begin{figure}[h]
 	\vspace{-2mm}
 	\centering
-    \includegraphics[width=8.5cm]{./figures/failingDebuggerTests.png} 
+    \includegraphics[width=8.4cm]{./figures/failingDebuggerTests.png} 
     \vspace{-3mm}
 	\caption{Failing \ic{DebuggerTestcase}s after modifying the generator}
 	\label{fig:TestExecution2}
@@ -69,12 +76,17 @@ debugger extension to solve the call stack construction.
 
 \subsection{Updating the Debugger Extension}
 
-Because \ic{ExecuteTestExpression} is generated to an \ic{Expression} containing
-calls to the referenced \ic{Testcase}s, our call stack lifting is now wrong.
-This lifting expects to contribute a \ic{StackFrame} for the generated
-\ic{Function}, which is not generated anymore.
-To solve the problem, we simply remove the implementation of
-\ic{StackFrameContributor} from \ic{ExecuteTestExpression}. Other aspects such as stepping, breakpoints
-and watches are not affected by the generator modification and hence do not need
-to be changed. After removing the interface implementation, all of our debugger
-tests pass again.
+The debugger extension expects for \ic{Testcase} to lift a stack
+frame whose name is prefixed with \emph{test\_} (see
+\sect{CallStackDebuggerDef}). However, this frame is not present and therefore
+the whole call stack construction fails with an error.
+To solve this problem, we change the expected name inside the rule as
+follows:
+\begin{lstlisting}[language=debuggerDSL,frame=single]
+String frameName = "testcase_" + this.name;
+contribute frame mapping for frames.select(name=frameName);
+\end{lstlisting}
+
+Other aspects, such as stepping, breakpoints or watches are not affected by the
+generator modification and hence do not need to be changed. Because other
+aspects after not affected by the change, all of our debugger tests pass again.

@@ -144,6 +144,7 @@ foreach testRef in this.tests {
 \end{lstlisting}
 
 \subsection{Call Stack}
+\label{CallStackDebuggerDef}
 
 \ic{Testcase} and \ic{ExecuteTestExpression} are translated to 
 base-level callables and therefore implement
@@ -162,7 +163,11 @@ contribute frame mapping for frames.select(name=getName());
 
 Similarly the mapping for \ic{Testcase} also requires linking the
 low-level stack frame to the respective instance. However, 
-it declares to \emph{show} the stack frame in the high-level call stack.
+it declares to \emph{show} the stack frame in the high-level call stack:
+\begin{lstlisting}[language=debuggerDSL,frame=single]
+String frameName = "test_" + this.name;
+contribute frame mapping for frames.select(name=frameName);
+\end{lstlisting}
 Further, we provide the name of the actual \ic{Testcase}, which is represented
 in the call stack view: Consider \lst{lst:generatedUT}, where we would
 show the name \ic{forTest} instead of \ic{test\_forTest}.
