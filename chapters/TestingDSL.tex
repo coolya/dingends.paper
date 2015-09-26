@@ -122,10 +122,10 @@ respective command n \emph{times}).
 \ic{ValidationConfig} contains a list of \ic{IValidation}s
 (\hyperref[CS2]{CS2}, \hyperref[R1]{R1}), implemented by
 \ic{CallStack}, \ic{CallStackRef} and \ic{OnPlatform}.
-\ic{CallStackRef} refers to a \ic{CallStack} and cannot
+\ic{CallStackRef} refers to a \ic{CallStack} that cannot
 be modified. Finally, \ic{OnPlatform} specifies a \ic{Platform}
-(\emph{Mac}, \emph{Unix} or \emph{Windows}) and executes 
-platform specific tests (\hyperref[R1]{R1}).
+(\emph{Mac}, \emph{Unix} or \emph{Windows}) and contains \emph{validations},
+which are only executed on the specific platform (\hyperref[R1]{R1}).
 
 \section{Writing Debugger Tests}
 
@@ -336,14 +336,14 @@ process output.
 As indicated by a green bubble on the left side of \fig{fig:TestExecution1}, all
 of our previously written \ic{DebuggerTestcase}s pass. 
 We show in the next section how language evolution will invalidate the debugger
-definition and this way cause all tests to fail.
+definition and this way cause all of our tests to fail.
 
 \begin{figure}[h]
 	\vspace{-2mm}
 	\centering
     \includegraphics[width=8.4cm]{./figures/debuggerTestExec.png} 
     \vspace{-3mm}
-	\caption{Executing \ic{DebuggerTestcase}s in \ac{MPS}}
+	\caption{Successful execution of \ic{DebuggerTestcase}s in \ac{MPS}}
 	\label{fig:TestExecution1}
 	\vspace{-3mm}
 \end{figure}

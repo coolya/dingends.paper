@@ -10,7 +10,7 @@ in debugger extensions after evolving the language.
 
 In this section we modify the MUnit generator to demonstrate how this affects
 the debugger. Currently, the generator reduces an \ic{Testcase} to a
-\ic{Function}, which name is prefixed with \emph{test\_}, 
+\ic{Function}: its name is prefixed with \emph{test\_}, 
 followed by the \ic{Testcase} name (see \lst{lst:generatedUT}).
 We now change this generator, so the \ic{Function} name is prefixed
 with \emph{testcase\_}, instead of \emph{test\_}.
@@ -76,17 +76,18 @@ construction.
 
 \subsection{Updating the Debugger Extension}
 
-The debugger extension expects for \ic{Testcase} to lift a stack
-frame whose name is prefixed with \emph{test\_} (see
-\sect{CallStackDebuggerDef}). However, this frame is not present and therefore
-the whole call stack construction fails with an error.
-To solve this problem, we change the expected name inside the rule as
-follows:
+The \emph{MUnit} debugger extension tries to lift for each \ic{Testcase} a stack
+frame whose name is prefixed with \emph{test\_}, followed by the name of the
+respective \ic{Testcase} (see \sect{CallStackDebuggerDef}). 
+However, due to our generator modification, this
+frame is not present and therefore the whole call stack construction fails with an error.
+To solve this problem, we update the name used for matching the 
+stack frame name:
 \begin{lstlisting}[language=debuggerDSL,frame=single]
 String frameName = "testcase_" + this.name;
 contribute frame mapping for frames.select(name=frameName);
 \end{lstlisting}
 
 Other aspects, such as stepping, breakpoints or watches are not affected by the
-generator modification and hence do not need to be changed. Because other
-aspects after not affected by the change, all of our debugger tests pass again.
+generator modification and hence do not need to be changed. Therefore, after 
+fixing the call stack lifting for \ic{Testcase} our debugger tests pass again.

@@ -25,7 +25,7 @@ expected to suspend and tests can be written for a specific platform.
 
 \textbf{\label{R2}R2 Debug control:} Similarly as in \hyperref[R1]{R1},
 generator changes also affect the stepping behavior. 
-Consider changing the \ic{FunctionCall} generator to inline called
+Consider changing the \ic{FunctionCall} generator to inline the body of called
 functions instead of calling them. This change would require modifications in
 the implementation of \emph{step into} as well. For being able to identify
 those problems, we need the ability to execute stepping commands (in, over

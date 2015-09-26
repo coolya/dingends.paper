@@ -2,8 +2,8 @@
 
 Wu et al. describe a unit testing framework for 
 \acp{DSL}~\cite{DBLP:conf/dsl/WuGM09} with focus on
-testing the semantics of the language.  However, it is necessary to have
-testing \acp{DSL} for all aspects of the language definition, \eg editor
+testing the semantics of the language.  However, from our perspective, it is
+necessary to have testing \acp{DSL} for all aspects of the language definition, \eg editor
 (concrete syntax), type system, scoping, transformation rules, and finally the
 debugger.\footnote{Specific language workbenches might require testing of additional aspects}
 mbeddr contains tests for the editor, type system, scoping and transformation
@@ -15,17 +15,17 @@ and the unit test framework of Python. While those tests verify the
 command line interface and the scripting \ac{API} of the debugger, they also
 test other functionality, such as using the help menu or changing the debugger settings.
 Further, some of the \ac{LLDB} tests verify the debugging behavior on different
-platforms, such as Darwin, Linux or FreeBSD. In contrast, we only concentrate on
+platforms, such as Darwin or Linux. In contrast, we only concentrate on
 testing the debugging behavior and we also support writing tests against
 specific platforms. However, the approach for testing the debugging behavior is
 derived from the \ac{LLDB} project: write a program in the source-language (mbeddr),
 compile it to an executable and debug it through test cases, which verify the
 debugging behavior.
 
-The \ac{GDB} provided by the GNU project takes a similar approach as
-the \ac{LLDB}: debugger tests cover different aspects of the debugger
+The \ac{GDB} debugger takes a similar approach as
+the \ac{LLDB}: tests cover different aspects of the debugger
 functionality and are written in a scripting language~\cite{gdb}.
-Contrarily, to our approach of testing the debugging behavior 
+Contrarily, to our approach of testing debugging 
 for one extensible language, the \ac{GDB} project tests
 debugging behavior for all of its supported languages, such as C, C++, Java, Ada
 etc. Further, those tests run on different platforms and target
