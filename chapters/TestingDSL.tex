@@ -103,7 +103,7 @@ while an \ic{abstract} \ic{DebuggerTestcase} requires none of these.
 \begin{figure}[h]
 	\vspace{-3mm}
 	\centering
-    \includegraphics[width=8.7cm]{./figures/graph4-3.png} 
+    \includegraphics[width=8.7cm]{./figures/graph4_paper.png} 
     \vspace{-3mm}
 	\caption{Structure of \ic{DebuggerTestcase}}
 	\label{fig:DebuggerTestcaseStructure}
@@ -298,7 +298,7 @@ Next, separate \ic{DebuggerTestcase}s are created, each for
 \emph{steppingOnLastStmnt} and specify only the respective \ic{ISteppingCommand}:
 
 \begin{lstlisting}[language=testingDSL,
-caption=Test stepping commands on last \ic{Statemet} in \ic{Testcase}] 
+caption=Test stepping commands on last \ic{Statement} in \ic{Testcase}] 
 testcase stepOverLastStmnt extends steppingOnLastStmnt { 
    then perform:                         
       step over 1 times                            

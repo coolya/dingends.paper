@@ -16,10 +16,10 @@ command line interface and the scripting \ac{API} of the debugger, they also
 test other functionality, such as using the help menu or changing the debugger settings.
 Further, some of the \ac{LLDB} tests verify the debugging behavior on different
 platforms, such as Darwin or Linux. In contrast, we only concentrate on
-testing the debugging behavior and we also support writing tests against
-specific platforms. However, the approach for testing the debugging behavior is
-derived from the \ac{LLDB} project: write a program in the source-language (mbeddr),
-compile it to an executable and debug it through test cases, which verify the
+testing the debugging behavior, but also support writing tests for
+specific platforms. Our approach for testing the debugging behavior is
+derived from the \ac{LLDB} project: write a program in the source-language
+(mbeddr), compile it to an executable and debug it through test cases, which verify the
 debugging behavior.
 
 The \ac{GDB} debugger takes a similar approach as
